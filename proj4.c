@@ -159,7 +159,7 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     ctx->image = NULL;
   }
   ctx->imageNum = imageNum;
-  SPOT_V3_SET(ctx->bgColor, 0.2f, 0.25f, 0.3f);
+  SPOT_V3_SET(ctx->bgColor, 0.0f, 0.0f, 0.0f);
   SPOT_V3_SET(ctx->lightDir, 1.0f, 0.0f, 0.0f);
   SPOT_V3_SET(ctx->lightColor, 1.0f, 1.0f, 1.0f);
   ctx->running = 1;
@@ -174,30 +174,62 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   ctx->shiftDown = 0;
   ctx->Zspread = 0.003;
 
-    // create the objects
-    //ctx->geom[0] = spotGeomNewSoftcube();
-    ctx->geom[0] = spotGeomNewSphere();
-    ctx->geom[1] = spotGeomNewSoftcube();
-    ctx->geom[2] = spotGeomNewCube1();
+  fprintf(stderr, "about to create objs\n");
 
-    // scale the objects
-    scaleGeom(ctx->geom[0], 0.15);
-    scaleGeom(ctx->geom[1], 0.15);
-    scaleGeom(ctx->geom[2], 0.15);
+    // create the objects
+    ctx->geom[0] = spotGeomNewSphere(); // Sun
+    ctx->geom[1] = spotGeomNewSphere(); // Mercury
+    ctx->geom[2] = spotGeomNewSphere(); // Venus
+    ctx->geom[3] = spotGeomNewSphere(); // Earth
+    ctx->geom[4] = spotGeomNewSphere(); // Mars
+    ctx->geom[5] = spotGeomNewSphere(); // Jupiter
+    ctx->geom[6] = spotGeomNewSphere(); // Saturn
+    ctx->geom[7] = spotGeomNewSphere(); // Uranus
+    ctx->geom[8] = spotGeomNewSphere(); // Neptune
+    ctx->geom[9] = spotGeomNewSphere(); // Pluto
+
+  fprintf(stderr, "created objs\n");
 
     // color the objects
-    SPOT_V3_SET(ctx->geom[0]->objColor, 1, 0, 0);
-    SPOT_V3_SET(ctx->geom[1]->objColor, 0, 1, 0);
-    SPOT_V3_SET(ctx->geom[2]->objColor, 0, 0, 1);
+    SPOT_V3_SET(ctx->geom[0]->objColor, 1.0f, 0.5f, 0.0f); // Sun
+    SPOT_V3_SET(ctx->geom[1]->objColor, 0.8f, 0.8f, 0.8f); // Mercury
+    SPOT_V3_SET(ctx->geom[2]->objColor, 0.7f, 0.7f, 1.0f); // Venus
+    SPOT_V3_SET(ctx->geom[3]->objColor, 0.1f, 0.7f, 1.0f); // Earth
+    SPOT_V3_SET(ctx->geom[4]->objColor, 1.0f, 0.5f, 0.0f); // Mars
+    SPOT_V3_SET(ctx->geom[5]->objColor, 1.0f, 0.7f, 0.1f); // Jupiter
+    SPOT_V3_SET(ctx->geom[6]->objColor, 0.8f, 0.8f, 1.0f); // Saturn
+    SPOT_V3_SET(ctx->geom[7]->objColor, 0.2f, 0.8f, 1.0f); // Uranus
+    SPOT_V3_SET(ctx->geom[8]->objColor, 1, 1, 0); // Neptune
+    SPOT_V3_SET(ctx->geom[9]->objColor, 1, 1, 0); // Pluto
 
     // translate the objects
-    translateGeomU(ctx->geom[1], 2.0f);
-    translateGeomU(ctx->geom[2], -2.0f);
+    translateGeomU(ctx->geom[0], -2.500f); // Sun
+    translateGeomU(ctx->geom[1], -0.395f); // Mercury 
+    translateGeomU(ctx->geom[2], -0.178f); // Venus 
+    translateGeomU(ctx->geom[3],  0.000f); // Earth 
+    translateGeomU(ctx->geom[4],  0.338f); // Mars 
+    translateGeomU(ctx->geom[5],  2.710f); // Jupiter 
+    translateGeomU(ctx->geom[6],  5.507f); // Saturn 
+    translateGeomU(ctx->geom[7],  11.73f); // Uranus 
+    translateGeomU(ctx->geom[8],  18.75f); // Neptune 
+    translateGeomU(ctx->geom[9],  24.84f); // Pluto 
+
+    // scale the objects so that they resemble true dimensions
+    scaleGeom(ctx->geom[0], 2.000f);  // Sun
+    scaleGeom(ctx->geom[1], 0.035f);  // Mercury
+    scaleGeom(ctx->geom[2], 0.086f);  // Venus
+    scaleGeom(ctx->geom[3], 0.091f);  // Earth
+    scaleGeom(ctx->geom[4], 0.048f); // Mars
+    scaleGeom(ctx->geom[5], 1.027f);    // Jupiter
+    scaleGeom(ctx->geom[6], 0.836f);  // Saturn
+    scaleGeom(ctx->geom[7], 0.337f); // Uranus
+    scaleGeom(ctx->geom[8], 0.326f);  // Neptune
+    scaleGeom(ctx->geom[9], 0.016f); // Pluto
 
     // set orientation
-    SPOT_V4_SET(ctx->geom[0]->quaternion, 1.0f, 0.0f, 0.0f, 0.0f);
-    SPOT_V4_SET(ctx->geom[1]->quaternion, 1.0f, 0.0f, 0.0f, 0.0f);
-    SPOT_V4_SET(ctx->geom[2]->quaternion, 1.0f, 0.0f, 0.0f, 0.0f);
+    for (gi=0; gi < geomNum; gi ++) {
+      SPOT_V4_SET(ctx->geom[gi]->quaternion, 1.0f, 0.0f, 0.0f, 0.0f);
+    }
 
     // load images
     spotImageLoadPNG(ctx->image[0], "textimg/uchic-rgb.png");     // texture
@@ -251,7 +283,7 @@ void setUnilocs() {
       SET_UNILOC(penumbra);
       SET_UNILOC(rStart);
       SET_UNILOC(rEnd);
-			SET_UNILOC(spotUp);
+      SET_UNILOC(spotUp);
       SET_UNILOC(lightColor);
       SET_UNILOC(modelMatrix);
       SET_UNILOC(normalMatrix);
@@ -348,7 +380,7 @@ int contextGLInit(context_t *ctx) {
   // NOTE: the following is equivalent to hitting '1' on the keyboard; i.e. default
   //       scene
   if (ctx->vertFname==NULL) {
-    gctx->program=programIds[ID_SPOTLIGHT];
+    gctx->program=programIds[ID_PHONG];
   }
 
   // NOTE: this sets the uniform locations for the _invoked_ shader
@@ -367,20 +399,22 @@ int contextGLInit(context_t *ctx) {
 				printf("ii: %d\n", ii);
       if (ctx->image[ii]->data.v) {
         // Only bother with GL init when image data has been set
-				if (ii==4 || ii==5 || ii==6) { // 5 is our cubemap
-					if (spotImageCubeMapGLInit(ctx->image[ii])) {
-						spotErrorAdd("%s: trouble with image[%u]", me, ii);
-						return 1;
-					} else {
-						printf("cubeMap: %d\n", ii);
-					}
-				} else if (spotImageGLInit(ctx->image[ii])) {
+        if (ii==4 || ii==5 || ii==6) { // 5 is our cubemap
+          if (spotImageCubeMapGLInit(ctx->image[ii])) {
+            spotErrorAdd("%s: trouble with image[%u]", me, ii);
+            return 1;
+          } else {
+            printf("cubeMap: %d\n", ii);
+          }
+        } else if (spotImageGLInit(ctx->image[ii])) {
           spotErrorAdd("%s: trouble with image[%u]", me, ii);
           return 1;
         }
       }
     }
   }
+
+  fprintf(stderr, "sucessfully initialized images\n");
 
   // NOTE: set to view mode (default)
   gctx->viewMode = 1;
@@ -391,8 +425,8 @@ int contextGLInit(context_t *ctx) {
   gctx->spinning = 0;
   gctx->minFilter = GL_NEAREST;
   gctx->magFilter = GL_NEAREST;
-  gctx->perVertexTexturingMode=1; // start in perVertexTexturingMode
-  perVertexTexturing();
+  gctx->perVertexTexturingMode=0; 
+//  perVertexTexturing();
 
   // NOTE: model initializations
   SPOT_M4_IDENTITY(gctx->model.xyzw);
@@ -411,12 +445,12 @@ int contextGLInit(context_t *ctx) {
   gctx->camera.up[1] = 1;
   gctx->camera.up[2] = 0;
   gctx->camera.from[0] = 0;
-  gctx->camera.from[1] = 0;
-  gctx->camera.from[2] = -1;
+  gctx->camera.from[1] = -2.0f;
+  gctx->camera.from[2] = -2.0f;
   gctx->camera.at[0] = 0;
   gctx->camera.at[1] = 0;
   gctx->camera.at[2] = 0;
-
+/*
   // NOTE: spotlight initializations
   SPOT_M4_IDENTITY(gctx->spotlight.uvn);
   SPOT_M4_IDENTITY(gctx->spotlight.inverse_uvn);
@@ -427,14 +461,16 @@ int contextGLInit(context_t *ctx) {
   gctx->spotlight.up[1] = 1;
   gctx->spotlight.up[2] = 0;
   SPOT_V3_SET(gctx->spotlight.from, 0.0f, 0.0f, -5.0f);
-	// Always 0,0,0
+  // Always 0,0,0
   gctx->spotlight.at[0] = 0;
   gctx->spotlight.at[1] = 0;
   gctx->spotlight.at[2] = 0;
-	gctx->spotlight.from[0] = 0;
-	gctx->spotlight.from[0] = 0;
-	gctx->spotlight.from[0] = -1;
-	gctx->spotlight.fixed = 0; // CHECK
+  gctx->spotlight.from[0] = 0;
+  gctx->spotlight.from[0] = 0;
+  gctx->spotlight.from[0] = -1;
+  gctx->spotlight.fixed = 0; // CHECK
+*/
+  fprintf(stderr, "sucessfully initialized camera & spotlight\n");
 
   // NOTE: Mouse function intializations
   gctx->mouseFun.m = NULL;
@@ -930,7 +966,7 @@ int main(int argc, const char* argv[]) {
     exit(1);
   }
 
-  if (!(gctx = contextNew(3, 7))) {
+  if (!(gctx = contextNew(10, 7))) {
     fprintf(stderr, "%s: context set-up problem:\n", me);
     spotErrorPrint();
     spotErrorClear();
