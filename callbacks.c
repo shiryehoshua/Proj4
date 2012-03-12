@@ -301,6 +301,7 @@ void callbackMouseButton(int button, int action)
           gctx->mouseFun.offset = 1;
           gctx->mouseFun.multiplier = 0.25;
           callbackResize(gctx->winSizeX, gctx->winSizeY);
+          fprintf(stderr, "fov: %f\n", gctx->camera.fov);
         }
       } else {
         printf(" ... (mode V) shrinks or grows (far distance) - (near distance)\n");
@@ -309,10 +310,10 @@ void callbackMouseButton(int button, int action)
           gctx->mouseFun.f = scale_near_far;
           gctx->mouseFun.multiplier = 0.25;
         } else if (gctx->lightMode) {
-					gctx->mouseFun.m = NULL;
-					gctx->mouseFun.f = scale_near_far2;
-					gctx->mouseFun.multiplier = 0.25;
-				}
+          gctx->mouseFun.m = NULL;
+          gctx->mouseFun.f = scale_near_far2;
+          gctx->mouseFun.multiplier = 0.25;
+        }
       }
     } else {
       if (!gctx->shiftDown) {
@@ -451,8 +452,8 @@ void callbackResize(int w, int h)
   }
 
   // Normalize
-  //wf /= hf;
-  //hf = 1
+//  wf /= hf;
+//  hf = 1;
   updateProj(gctx->camera.proj, wf, hf, gctx->camera.near, gctx->camera.far, gctx->camera.ortho);
 
   /* By default the tweak bar maintains its position relative to the

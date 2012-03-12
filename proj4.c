@@ -164,8 +164,8 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   SPOT_V3_SET(ctx->lightColor, 1.0f, 1.0f, 1.0f);
   ctx->running = 1;
   ctx->program = 0;
-  ctx->winSizeX = 900;
-  ctx->winSizeY = 700;
+  ctx->winSizeX = 1500;
+  ctx->winSizeY = 900;
   ctx->tbarSizeX = 200;
   ctx->tbarSizeY = 300;
   ctx->tbarMargin = 20;
@@ -210,9 +210,9 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     translateGeomU(ctx->geom[4],  0.338f); // Mars 
     translateGeomU(ctx->geom[5],  2.710f); // Jupiter 
     translateGeomU(ctx->geom[6],  5.507f); // Saturn 
-    translateGeomU(ctx->geom[7],  11.73f); // Uranus 
-    translateGeomU(ctx->geom[8],  18.75f); // Neptune 
-    translateGeomU(ctx->geom[9],  24.84f); // Pluto 
+    translateGeomU(ctx->geom[7],  9.73f); // Uranus 
+    translateGeomU(ctx->geom[8],  11.75f); // Neptune 
+    translateGeomU(ctx->geom[9],  15.84f); // Pluto 
 
     // scale the objects so that they resemble true dimensions
     scaleGeom(ctx->geom[0], 2.000f);  // Sun
@@ -229,30 +229,22 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     // set orientation
     for (gi=0; gi < geomNum; gi ++) {
       SPOT_V4_SET(ctx->geom[gi]->quaternion, 1.0f, 0.0f, 0.0f, 0.0f);
+      ctx->geom[gi]->Kd = 0.4;
+      ctx->geom[gi]->Ks = 0.3;
+      ctx->geom[gi]->Ka = 0.3;
     }
 
     // load images
-    spotImageLoadPNG(ctx->image[0], "textimg/uchic-rgb.png");     // texture
-    spotImageLoadPNG(ctx->image[1], "textimg/uchic-norm08.png");  // bump map
-    //spotImageLoadPNG(ctx->image[2], "textimg/uchic-hght08.png");
-    spotImageLoadPNG(ctx->image[2], "textimg/uchic-norm08.png");
-    spotImageLoadPNG(ctx->image[3], "textimg/check-rgb.png");
-
-		//spotImageLoadPNG(ctx->image[4], "textimg/cube-sample.png");
-		spotImageLoadPNG(ctx->image[4], "textimg/cube-sample.png");
-		spotImageLoadPNG(ctx->image[5], "textimg/cube-cool.png");
-		spotImageLoadPNG(ctx->image[6], "textimg/cube-place.png");
-
-    // set lighting constants
-    ctx->geom[0]->Kd = 0.4;
-    ctx->geom[0]->Ks = 0.3;
-    ctx->geom[0]->Ka = 0.3;
-    ctx->geom[1]->Kd = 0.4;
-    ctx->geom[1]->Ks = 0.3;
-    ctx->geom[1]->Ka = 0.3;
-    ctx->geom[2]->Kd = 0.4;
-    ctx->geom[2]->Ks = 0.3;
-    ctx->geom[2]->Ka = 0.3;
+    spotImageLoadPNG(ctx->image[0], "textimg/sun.png");     // texture
+    spotImageLoadPNG(ctx->image[1], "textimg/mercury.png");  // bump map
+    spotImageLoadPNG(ctx->image[2], "textimg/venus.png");
+    spotImageLoadPNG(ctx->image[3], "textimg/earth.png");
+    spotImageLoadPNG(ctx->image[4], "textimg/mars.png");
+    spotImageLoadPNG(ctx->image[5], "textimg/jupiter.png");
+    spotImageLoadPNG(ctx->image[6], "textimg/saturn.png");
+    spotImageLoadPNG(ctx->image[7], "textimg/uranus.png");
+    spotImageLoadPNG(ctx->image[8], "textimg/neptune.png");
+    spotImageLoadPNG(ctx->image[9], "textimg/pluto.png");
 
   ctx->ticDraw = -1;
   ctx->ticMouse = -1;
@@ -261,7 +253,7 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   ctx->thetaPerSecN = 0;
 	ctx->onlyN = 0;
 
-	ctx->cubeMapId = 2;
+//	ctx->cubeMapId = 2;
 
   ctx->angleU = 0;
   ctx->angleV = 0;
@@ -301,7 +293,7 @@ void setUnilocs() {
       SET_UNILOC(samplerA);
       SET_UNILOC(samplerB);
       SET_UNILOC(samplerC);
-      SET_UNILOC(cubeMap);
+//      SET_UNILOC(cubeMap);
       SET_UNILOC(samplerD);
       SET_UNILOC(Zu);
       SET_UNILOC(Zv);
@@ -399,14 +391,17 @@ int contextGLInit(context_t *ctx) {
 				printf("ii: %d\n", ii);
       if (ctx->image[ii]->data.v) {
         // Only bother with GL init when image data has been set
-        if (ii==4 || ii==5 || ii==6) { // 5 is our cubemap
+/*
+        if (ii=10) { //ii==4 || ii==5 || ii==6) { // 5 is our cubemap
           if (spotImageCubeMapGLInit(ctx->image[ii])) {
             spotErrorAdd("%s: trouble with image[%u]", me, ii);
             return 1;
           } else {
             printf("cubeMap: %d\n", ii);
           }
-        } else if (spotImageGLInit(ctx->image[ii])) {
+        } else 
+*/
+        if (spotImageGLInit(ctx->image[ii])) {
           spotErrorAdd("%s: trouble with image[%u]", me, ii);
           return 1;
         }
@@ -426,7 +421,7 @@ int contextGLInit(context_t *ctx) {
   gctx->minFilter = GL_NEAREST;
   gctx->magFilter = GL_NEAREST;
   gctx->perVertexTexturingMode=0; 
-//  perVertexTexturing();
+  perVertexTexturing();
 
   // NOTE: model initializations
   SPOT_M4_IDENTITY(gctx->model.xyzw);
@@ -446,7 +441,7 @@ int contextGLInit(context_t *ctx) {
   gctx->camera.up[2] = 0;
   gctx->camera.from[0] = 0;
   gctx->camera.from[1] = -2.0f;
-  gctx->camera.from[2] = -2.0f;
+  gctx->camera.from[2] = 25.0f;
   gctx->camera.at[0] = 0;
   gctx->camera.at[1] = 0;
   gctx->camera.at[2] = 0;
@@ -589,8 +584,8 @@ int contextDraw(context_t *ctx) {
      informative */
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, ctx->image[4+ctx->cubeMapId]->textureId);
-  glUniform1i(ctx->uniloc.cubeMap, 0);
+//  glBindTexture(GL_TEXTURE_CUBE_MAP, ctx->image[4+ctx->cubeMapId]->textureId);
+//  glUniform1i(ctx->uniloc.cubeMap, 0);
 
   // NOTE: recall that image[0] is "uchic-rgb.png"
   glActiveTexture(GL_TEXTURE1);
@@ -726,7 +721,7 @@ static void TW_CALL getBumpMappingCallback(void *value, void *clientData) {
   *((int *) value) = gctx->bumpMappingMode;
 }
 
-static void TW_CALL setCubeMapCallback(const void *value, void *clientData) {
+/*static void TW_CALL setCubeMapCallback(const void *value, void *clientData) {
 	enum CubeMaps cubemap = *((const enum CubeMaps *) value);
 	switch (cubemap) {
 		case CubeSample:
@@ -743,7 +738,7 @@ static void TW_CALL setCubeMapCallback(const void *value, void *clientData) {
 
 static void TW_CALL getCubeMapCallback(void *value, void *clientData) {
   *((int *) value) = gctx->cubeMapId;
-}
+} */
 static void TW_CALL setShaderCallback(const void *value, void *clientData) {
 	enum Shaders shader = *((const enum Shaders *) value);
 	switch (shader) {
@@ -844,17 +839,17 @@ int updateTweakBarVars(int scene) {
                              TW_TYPE_FLOAT, &(gctx->geom[0]->shexp),
                              " label='shexp' min=0.0 max=100.0 step=0.05");
   if (!EE) EE |= !TwAddVarCB(gctx->tbar, "shader",
-														 twShaders, setShaderCallback,
-														 getShaderCallback, &(gctx->program),
-														 " label='shader'");
+                             twShaders, setShaderCallback,
+                             getShaderCallback, &(gctx->program),
+                             " label='shader'");
   if (!EE) EE |= !TwAddVarCB(gctx->tbar, "object",
-														 twObjects, setObjectCallback,
-														 getObjectCallback, &(gctx->gi),
-														 " label='object'");
-  if (!EE) EE |= !TwAddVarCB(gctx->tbar, "cubemap",
-														 twCubeMaps, setCubeMapCallback,
-														 getCubeMapCallback, &(gctx->cubeMapId),
-														 " label='cubemap'");
+                             twObjects, setObjectCallback,
+                             getObjectCallback, &(gctx->gi),
+                             " label='object'");
+/*  if (!EE) EE |= !TwAddVarCB(gctx->tbar, "cubemap",
+                             twCubeMaps, setCubeMapCallback,
+                             getCubeMapCallback, &(gctx->cubeMapId),
+                             " label='cubemap'"); */
   if (!EE) EE |= !TwAddVarRW(gctx->tbar, "bgColor",
                              TW_TYPE_COLOR3F, &(gctx->bgColor),
                              " label='bkgr color' ");
@@ -966,7 +961,7 @@ int main(int argc, const char* argv[]) {
     exit(1);
   }
 
-  if (!(gctx = contextNew(10, 7))) {
+  if (!(gctx = contextNew(10, 10))) {
     fprintf(stderr, "%s: context set-up problem:\n", me);
     spotErrorPrint();
     spotErrorClear();
