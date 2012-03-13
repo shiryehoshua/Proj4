@@ -343,7 +343,7 @@ void callbackMouseButton(int button, int action)
           printf(" ... (mode V) translates eye and look-at along U and V\n");
           gctx->mouseFun.m = gctx->camera.uvn;
           gctx->mouseFun.f = translate_view_UV;
-          gctx->mouseFun.multiplier = -4;
+          gctx->mouseFun.multiplier = -32;
         } else if (gctx->modelMode) {
           printf(" ... (mode M) translates object along U and V\n");
           gctx->mouseFun.m = gctx->geom[gctx->gi]->modelMatrix;
