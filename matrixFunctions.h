@@ -88,6 +88,8 @@ void scaleGeomX(spotGeom *g, GLfloat s);
 void scaleGeomY(spotGeom *g, GLfloat s);
 void scaleGeomZ(spotGeom *g, GLfloat s);
 
+void orbit(spotGeom *obj, GLfloat *axis, GLfloat theta);
+
 void identity(GLfloat *t, GLfloat *s, size_t i);
 
 void copy_V3(GLfloat u[3], GLfloat uvn[4*4], int i);

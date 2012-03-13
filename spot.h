@@ -130,6 +130,9 @@ typedef struct {
     tangBuffId,
     indxBuffId;
     GLfloat axialThetaPerSec; // Theta per second for axial rotation
+    GLfloat orbitThetaPerSec; // Theta per second for axial rotation
+    GLfloat radius;
+    GLfloat orbitAxis[3];
 } spotGeom;
 
 /*

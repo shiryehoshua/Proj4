@@ -209,17 +209,33 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     SPOT_V3_SET(ctx->geom[8]->objColor, 1, 1, 0); // Neptune
     SPOT_V3_SET(ctx->geom[9]->objColor, 1, 1, 0); // Pluto
 
-    // translate the objects
-    translateGeomU(ctx->geom[0], -2.500f); // Sun
-    translateGeomU(ctx->geom[1], -0.395f); // Mercury 
-    translateGeomU(ctx->geom[2], -0.178f); // Venus 
-    translateGeomU(ctx->geom[3],  0.000f); // Earth 
-    translateGeomU(ctx->geom[4],  0.338f); // Mars 
-    translateGeomU(ctx->geom[5],  2.710f); // Jupiter 
-    translateGeomU(ctx->geom[6],  5.507f); // Saturn 
-    translateGeomU(ctx->geom[7],  9.73f); // Uranus 
-    translateGeomU(ctx->geom[8],  11.75f); // Neptune 
-    translateGeomU(ctx->geom[9],  15.84f); // Pluto 
+    // set object radius
+    ctx->geom[0]->radius = 0.000f;
+    ctx->geom[1]->radius = 2.105f;
+    ctx->geom[2]->radius = 2.322f; 
+    ctx->geom[3]->radius = 2.500f;
+    ctx->geom[4]->radius = 2.838f;
+    ctx->geom[5]->radius = 5.210f;
+    ctx->geom[6]->radius = 8.007f;
+    ctx->geom[7]->radius = 12.23f;
+    ctx->geom[8]->radius = 14.25f;
+    ctx->geom[9]->radius = 18.34f;
+
+    // set object orbit axis
+    SPOT_V3_SET(ctx->geom[0]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[1]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[2]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[3]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[4]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[5]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[6]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[7]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[8]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[9]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+
+    for (gi=0; gi < geomNum; gi ++) {
+      translateGeomU(ctx->geom[gi], ctx->geom[gi]->radius);
+    }
 
     // set axialThetaPerSec
     ctx->geom[0]->axialThetaPerSec = 0.01f;
@@ -232,6 +248,18 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     ctx->geom[7]->axialThetaPerSec = 0.01f; 
     ctx->geom[8]->axialThetaPerSec = 0.01f; 
     ctx->geom[9]->axialThetaPerSec = 0.01f; 
+
+    // set orbitThetaPerSec
+    ctx->geom[0]->orbitThetaPerSec = 0.01f;
+    ctx->geom[1]->orbitThetaPerSec = 0.01f;
+    ctx->geom[2]->orbitThetaPerSec = 0.01f;
+    ctx->geom[3]->orbitThetaPerSec = 0.01f;
+    ctx->geom[4]->orbitThetaPerSec = 0.01f;
+    ctx->geom[5]->orbitThetaPerSec = 0.01f;
+    ctx->geom[6]->orbitThetaPerSec = 0.01f;
+    ctx->geom[7]->orbitThetaPerSec = 0.01f;
+    ctx->geom[8]->orbitThetaPerSec = 0.01f;
+    ctx->geom[9]->orbitThetaPerSec = 0.01f;
 
     // scale the objects so that they resemble true dimensions
     scaleGeom(ctx->geom[0], 2.000f); // Sun
@@ -677,6 +705,9 @@ int contextDraw(context_t *ctx) {
   for (gi=0; gi<ctx->geomNum; gi++) {
     // have each planet rotate accordingly
     rotate_model_ith(ctx->geom[gi], ctx->geom[gi]->axialThetaPerSec, 1); 
+
+    // have each planet orbit accordingly
+    orbit(ctx->geom[gi], ctx->geom[gi]->orbitAxis, ctx->geom[gi]->orbitThetaPerSec);
 
     set_model_transform(modelMat, ctx->geom[gi]);
     glUniformMatrix4fv(ctx->uniloc.modelMatrix, 

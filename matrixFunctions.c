@@ -519,6 +519,28 @@ void scaleGeomZ(spotGeom *g, GLfloat s)
   SPOT_M4_SET_2(g->modelMatrix, t);
 }
 
+/* Orbitting */
+void orbit(spotGeom *obj, GLfloat axis[3], GLfloat theta)
+{
+  GLfloat co, si, r, temp, zero[4], pos[4], x[3], y[3];
+
+  r = obj->radius;
+  zero[0] = zero[1] = zero[2] = zero[3] = 0;
+  co = cosf(theta); si = sinf(theta);
+
+  // get position of the object
+  SPOT_M4V4_MUL(pos, obj->modelMatrix, zero);
+
+  // set x and y 
+  SPOT_V3_NORM(y, axis, temp); 
+  SPOT_V3_SCALE(y, r * si, y);
+  SPOT_V3_COPY(x, y);
+
+  translate(obj->modelMatrix, x);
+  translate(obj->modelMatrix, y); 
+}
+
+
 /* Identity (AKA do nothing) */
 
 void identity(GLfloat *t, GLfloat *s, size_t i)
