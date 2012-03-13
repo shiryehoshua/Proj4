@@ -35,32 +35,62 @@ void main() {
 
   vec4 c;
   vec2 tc;
-  if (seamFix!=0) { // without seam
+  // fix seam
     // recover theta from the vertex shader
-    // atan(sin(theta)/cos(theta))
     tc.x = -0.5 * PI_INV * atan(texCoord.z, texCoord.x) ;
     tc.y = texCoord.y;
-  }
-  else {
-    tc = texCoord.xy;
-  }
 
   switch (gi)
   {
     case 0:
       c = texture(sampler0, tc);
       break;
+
     case 1:
       c = texture(sampler1, tc);
       break;
+
+    case 2:
+      c = texture(sampler2, tc);
+      break;
+
+    case 3:
+      c = texture(sampler3, tc);
+      break;
+
+    case 4:
+      c = texture(sampler4, tc);
+      break;
+
+    case 5:
+      c = texture(sampler5, tc);
+      break;
+
+    case 6:
+      c = texture(sampler6, tc);
+      break;
+
+    case 7:
+      c = texture(sampler7, tc);
+      break;
+
+    case 8:
+      c = texture(sampler8, tc);
+      break;
+
+    case 9:
+      c = texture(sampler9, tc);
+      break;
+
     default:
-      c.r = c.g = c.b = 0;
+      c.rgb = objColor;
+     
   }
 
-  if (gouraudMode != 0) { // in Gouraud mode
+/*  if (gouraudMode != 0) { // in Gouraud mode
     color = fragColor;
   }
-  else { // in Phong mode
+  else { // in Phong mode */
     vec3 diff = Kd * max(0.0, dot(vnrm, lightDir)) * c.rgb;
     vec3 amb = Ka * c.rgb;
 
@@ -71,6 +101,6 @@ void main() {
     color.rgb = diff + amb + spec;
     color.a = 1.0;
 
-    color.r = color.g = color.b = 0;
-  }
+//    color = c;
+//  }
 }

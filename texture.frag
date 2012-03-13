@@ -10,8 +10,16 @@ uniform int gi;
 uniform vec3 lightDir;
 uniform vec3 lightColor;
 uniform vec3 objColor;
-uniform sampler2D samplerA;
-uniform sampler2D samplerB;
+uniform sampler2D sampler0;
+uniform sampler2D sampler1;
+uniform sampler2D sampler2;
+uniform sampler2D sampler3;
+uniform sampler2D sampler4;
+uniform sampler2D sampler5;
+uniform sampler2D sampler6;
+uniform sampler2D sampler7;
+uniform sampler2D sampler8;
+uniform sampler2D sampler9;
 uniform float Ka;
 uniform float Kd;
 uniform float Ks;
@@ -40,10 +48,10 @@ void main() {
   switch (gi)
   {
     case 0:
-      c = texture(samplerA, tc);
+      c = texture(sampler0, tc);
       break;
     case 1:
-      c = texture(samplerB, tc);
+      c = texture(sampler1, tc);
       break;
     default:
       c.rgb = objColor;
@@ -53,7 +61,7 @@ void main() {
     color = fragColor;
   }
   else { // in Phong mode
-    vec3 diff = Kd * max(0.0, dot(vnrm, lightDir)) * objColor;
+    vec3 diff = Kd * max(0.0, dot(vnrm, lightDir)) * c.rgb;
     vec3 amb = Ka * c.rgb;
 
     vec3 r = normalize(reflect(-normalize(lightDir), normalize(vnrm)));
@@ -62,5 +70,7 @@ void main() {
 
     color.rgb = diff + amb + spec;
     color.a = 1.0;
+
+    color.rgb = c.rgb;
   }
 }

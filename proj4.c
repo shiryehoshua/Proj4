@@ -41,15 +41,15 @@ TwEnumVal twBumpMappingModesEV[]={{Disabled, "Disabled"},
                                   {Linear, "Linear"},
                                   {NearestWithMipmap, "NearestWithMipmap"},
                                   {LinearWithMipmap, "LinearWithMipmap"}},
-					twObjectsEV[]					={{Sphere, "Sphere"},
-																	{Softcube, "Softcube"},
-																	{Cube, "Cube"}},
-					twCubeMapsEV[]				={{CubeSample, "cube-sample.png"},
-																	{CubeCool, "cube-cool.png"},
-																	{CubePlace, "cube-place.png"}},
-					twShadersEV[]					={{PhongShader, "phong.{vert,frag}"},
-																	{CubeShader, "cube.{vert,frag}"},
-																	{SpotlightShader, "spotlight.{vert,frag}"}};
+          twObjectsEV[]          ={{Sphere, "Sphere"},
+                                  {Softcube, "Softcube"},
+                                  {Cube, "Cube"}},
+          twCubeMapsEV[]         ={{CubeSample, "cube-sample.png"},
+                                  {CubeCool, "cube-cool.png"},
+                                  {CubePlace, "cube-place.png"}},
+          twShadersEV[]          ={{PhongShader, "phong.{vert,frag}"},
+                                  {CubeShader, "cube.{vert,frag}"},
+                                  {SpotlightShader, "spotlight.{vert,frag}"}};
 
 
 // NOTE: we'd prefer to only draw one shape at a time, while keeping a sphere and
@@ -215,15 +215,15 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     translateGeomU(ctx->geom[9],  15.84f); // Pluto 
 
     // scale the objects so that they resemble true dimensions
-    scaleGeom(ctx->geom[0], 2.000f);  // Sun
-    scaleGeom(ctx->geom[1], 0.035f);  // Mercury
-    scaleGeom(ctx->geom[2], 0.086f);  // Venus
-    scaleGeom(ctx->geom[3], 0.091f);  // Earth
+    scaleGeom(ctx->geom[0], 2.000f); // Sun
+    scaleGeom(ctx->geom[1], 0.035f); // Mercury
+    scaleGeom(ctx->geom[2], 0.086f); // Venus
+    scaleGeom(ctx->geom[3], 0.091f); // Earth
     scaleGeom(ctx->geom[4], 0.048f); // Mars
-    scaleGeom(ctx->geom[5], 1.027f);    // Jupiter
-    scaleGeom(ctx->geom[6], 0.836f);  // Saturn
+    scaleGeom(ctx->geom[5], 1.027f); // Jupiter
+    scaleGeom(ctx->geom[6], 0.836f); // Saturn
     scaleGeom(ctx->geom[7], 0.337f); // Uranus
-    scaleGeom(ctx->geom[8], 0.326f);  // Neptune
+    scaleGeom(ctx->geom[8], 0.326f); // Neptune
     scaleGeom(ctx->geom[9], 0.016f); // Pluto
 
     // set orientation
@@ -235,16 +235,16 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     }
 
     // load images
-    spotImageLoadPNG(ctx->image[0], "textimg/sun.png");     // texture
-    spotImageLoadPNG(ctx->image[1], "textimg/mercury.png");  // bump map
-    spotImageLoadPNG(ctx->image[2], "textimg/venus.png");
-    spotImageLoadPNG(ctx->image[3], "textimg/earth.png");
-    spotImageLoadPNG(ctx->image[4], "textimg/mars.png");
-    spotImageLoadPNG(ctx->image[5], "textimg/jupiter.png");
-    spotImageLoadPNG(ctx->image[6], "textimg/saturn.png");
-    spotImageLoadPNG(ctx->image[7], "textimg/uranus.png");
-    spotImageLoadPNG(ctx->image[8], "textimg/neptune.png");
-    spotImageLoadPNG(ctx->image[9], "textimg/pluto.png");
+    spotImageLoadPNG(ctx->image[0], "textimg/sun.png");     // Sun
+    spotImageLoadPNG(ctx->image[1], "textimg/mercury.png"); // Mercury 
+    spotImageLoadPNG(ctx->image[2], "textimg/venus.png");   // Venus
+    spotImageLoadPNG(ctx->image[3], "textimg/earth.png");   // Earth
+    spotImageLoadPNG(ctx->image[4], "textimg/mars.png");    // Mars
+    spotImageLoadPNG(ctx->image[5], "textimg/jupiter.png"); // Jupiter
+    spotImageLoadPNG(ctx->image[6], "textimg/saturn.png");  // Saturn
+    spotImageLoadPNG(ctx->image[7], "textimg/uranus.png");  // Uranus
+    spotImageLoadPNG(ctx->image[8], "textimg/neptune.png"); // Neptune
+    spotImageLoadPNG(ctx->image[9], "textimg/pluto.png");   // Pluto
 
   ctx->ticDraw = -1;
   ctx->ticMouse = -1;
@@ -259,7 +259,7 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   ctx->angleV = 0;
   ctx->angleN = 0;
 
-	ctx->gi = 1;
+  ctx->gi = 0;
 
   return ctx;
 }
@@ -290,11 +290,17 @@ void setUnilocs() {
       SET_UNILOC(gouraudMode);
       SET_UNILOC(seamFix);
       SET_UNILOC(shexp);
-      SET_UNILOC(samplerA);
-      SET_UNILOC(samplerB);
-      SET_UNILOC(samplerC);
+      SET_UNILOC(sampler0);
+      SET_UNILOC(sampler1);
+      SET_UNILOC(sampler2);
+      SET_UNILOC(sampler3);
+      SET_UNILOC(sampler4);
+      SET_UNILOC(sampler5);
+      SET_UNILOC(sampler6);
+      SET_UNILOC(sampler7);
+      SET_UNILOC(sampler8);
+      SET_UNILOC(sampler9);
 //      SET_UNILOC(cubeMap);
-      SET_UNILOC(samplerD);
       SET_UNILOC(Zu);
       SET_UNILOC(Zv);
       SET_UNILOC(Zspread);
@@ -372,7 +378,7 @@ int contextGLInit(context_t *ctx) {
   // NOTE: the following is equivalent to hitting '1' on the keyboard; i.e. default
   //       scene
   if (ctx->vertFname==NULL) {
-    gctx->program=programIds[ID_PHONG];
+    gctx->program=programIds[ID_TEXTURE];
   }
 
   // NOTE: this sets the uniform locations for the _invoked_ shader
@@ -583,23 +589,59 @@ int contextDraw(context_t *ctx) {
      pg 279.  Also, http://tinyurl.com/7bvnej3 is amusing and
      informative */
 
-  glActiveTexture(GL_TEXTURE0);
+//  glActiveTexture(GL_TEXTURE0);
 //  glBindTexture(GL_TEXTURE_CUBE_MAP, ctx->image[4+ctx->cubeMapId]->textureId);
 //  glUniform1i(ctx->uniloc.cubeMap, 0);
 
-  // NOTE: recall that image[0] is "uchic-rgb.png"
+  // Sun
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, ctx->image[0]->textureId);
-  glUniform1i(ctx->uniloc.samplerA, 1);
+  glUniform1i(ctx->uniloc.sampler0, 1);
 
-  // NOTE: recall that image[0] is "uchic-norm08.png"
-/*  glActiveTexture(GL_TEXTURE2);
+  // Mercury 
+  glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, ctx->image[1]->textureId);
-  glUniform1i(ctx->uniloc.samplerB, 2);
+  glUniform1i(ctx->uniloc.sampler1, 2);
 
+  // Venus
   glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, ctx->image[2]->textureId);
-  glUniform1i(ctx->uniloc.samplerC, 3); */
+  glUniform1i(ctx->uniloc.sampler2, 3); 
+
+  // Earth
+  glActiveTexture(GL_TEXTURE4);
+  glBindTexture(GL_TEXTURE_2D, ctx->image[3]->textureId);
+  glUniform1i(ctx->uniloc.sampler2, 4); 
+
+  // Mars
+  glActiveTexture(GL_TEXTURE5);
+  glBindTexture(GL_TEXTURE_2D, ctx->image[4]->textureId);
+  glUniform1i(ctx->uniloc.sampler2, 5); 
+
+  // Jupiter
+  glActiveTexture(GL_TEXTURE6);
+  glBindTexture(GL_TEXTURE_2D, ctx->image[5]->textureId);
+  glUniform1i(ctx->uniloc.sampler2, 6); 
+
+  // Saturn
+  glActiveTexture(GL_TEXTURE7);
+  glBindTexture(GL_TEXTURE_2D, ctx->image[6]->textureId);
+  glUniform1i(ctx->uniloc.sampler2, 7); 
+
+  // Uranus
+  glActiveTexture(GL_TEXTURE8);
+  glBindTexture(GL_TEXTURE_2D, ctx->image[7]->textureId);
+  glUniform1i(ctx->uniloc.sampler2, 8); 
+
+  // Neptune
+  glActiveTexture(GL_TEXTURE9);
+  glBindTexture(GL_TEXTURE_2D, ctx->image[8]->textureId);
+  glUniform1i(ctx->uniloc.sampler2, 9); 
+
+  // Pluto
+  glActiveTexture(GL_TEXTURE10);
+  glBindTexture(GL_TEXTURE_2D, ctx->image[9]->textureId);
+  glUniform1i(ctx->uniloc.sampler2, 10); 
 
   // NOTE: we must normalize our UVN matrix
   norm_M4(gctx->camera.uvn);
@@ -629,6 +671,7 @@ int contextDraw(context_t *ctx) {
     glUniform3fv(ctx->uniloc.objColor, 1, ctx->geom[gi]->objColor);
     glUniform1f(ctx->uniloc.Ka, ctx->geom[gi]->Ka);
     glUniform1f(ctx->uniloc.Kd, ctx->geom[gi]->Kd);
+    glUniform1i(ctx->uniloc.gi, gi);
     spotGeomDraw(ctx->geom[gi]);
   }
 
@@ -654,11 +697,11 @@ int contextDraw(context_t *ctx) {
   /* These lines are also related to using textures.  We finish by
      leaving GL_TEXTURE0 as the active unit since AntTweakBar uses
      that, but doesn't seem to explicitly select it */
-/*  glActiveTexture(GL_TEXTURE3);
+  glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, 3);
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, 2);
-  glActiveTexture(GL_TEXTURE1); */
+  glActiveTexture(GL_TEXTURE1); 
   glBindTexture(GL_TEXTURE_2D, 1);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -838,10 +881,10 @@ int updateTweakBarVars(int scene) {
   if (!EE) EE |= !TwAddVarRW(gctx->tbar, "shexp",
                              TW_TYPE_FLOAT, &(gctx->geom[0]->shexp),
                              " label='shexp' min=0.0 max=100.0 step=0.05");
-  if (!EE) EE |= !TwAddVarCB(gctx->tbar, "shader",
+/*  if (!EE) EE |= !TwAddVarCB(gctx->tbar, "shader",
                              twShaders, setShaderCallback,
                              getShaderCallback, &(gctx->program),
-                             " label='shader'");
+                             " label='shader'"); */
   if (!EE) EE |= !TwAddVarCB(gctx->tbar, "object",
                              twObjects, setObjectCallback,
                              getObjectCallback, &(gctx->gi),

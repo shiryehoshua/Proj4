@@ -25,7 +25,7 @@ extern "C" {
 #define TBAR_NAME "Project2-Params"
 
 // NOTE: Shaders are populated in our main
-#define NUM_PROGRAMS 7
+#define NUM_PROGRAMS 0
 // NOTE: easy program lookup--refer to programIds[ID_${shader}] for the id to use with
 //       `glLinkProgram'
 #define ID_CUBE 0
@@ -113,10 +113,16 @@ typedef struct {
   GLint lightColor;   /* same name as field in context_t */
   GLint gouraudMode;  /* same name as field in context_t */
   GLint seamFix;
-  GLint samplerA;     /* possible name of texture sampler in fragment shader */
-  GLint samplerB;     /* possible name of texture sampler in fragment shader */
-  GLint samplerC;     /* possible name of texture sampler in fragment shader */
-  GLint samplerD;     /* possible name of texture sampler in fragment shader */
+  GLint sampler0;     /* possible name of texture sampler in fragment shader */
+  GLint sampler1;     /* possible name of texture sampler in fragment shader */
+  GLint sampler2;     /* possible name of texture sampler in fragment shader */
+  GLint sampler3;     /* possible name of texture sampler in fragment shader */
+  GLint sampler4;     /* possible name of texture sampler in fragment shader */
+  GLint sampler5;     /* possible name of texture sampler in fragment shader */
+  GLint sampler6;     /* possible name of texture sampler in fragment shader */
+  GLint sampler7;     /* possible name of texture sampler in fragment shader */
+  GLint sampler8;     /* possible name of texture sampler in fragment shader */
+  GLint sampler9;     /* possible name of texture sampler in fragment shader */
   GLint cubeMap;     /* possible name of texture sampler in fragment shader */
   GLint Zu, Zv, Zspread;
 } uniloc_t;
