@@ -259,7 +259,7 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   ctx->angleV = 0;
   ctx->angleN = 0;
 
-  ctx->gi = 0;
+  ctx->gi = 5;
 
   return ctx;
 }
@@ -427,7 +427,7 @@ int contextGLInit(context_t *ctx) {
   gctx->minFilter = GL_NEAREST;
   gctx->magFilter = GL_NEAREST;
   gctx->perVertexTexturingMode=0; 
-  perVertexTexturing();
+//  perVertexTexturing();
 
   // NOTE: model initializations
   SPOT_M4_IDENTITY(gctx->model.xyzw);
@@ -594,54 +594,54 @@ int contextDraw(context_t *ctx) {
 //  glUniform1i(ctx->uniloc.cubeMap, 0);
 
   // Sun
-  glActiveTexture(GL_TEXTURE1);
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, ctx->image[0]->textureId);
-  glUniform1i(ctx->uniloc.sampler0, 1);
+  glUniform1i(ctx->uniloc.sampler0, 0);
 
   // Mercury 
-  glActiveTexture(GL_TEXTURE2);
+  glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, ctx->image[1]->textureId);
-  glUniform1i(ctx->uniloc.sampler1, 2);
+  glUniform1i(ctx->uniloc.sampler1, 1);
 
   // Venus
-  glActiveTexture(GL_TEXTURE3);
+  glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, ctx->image[2]->textureId);
-  glUniform1i(ctx->uniloc.sampler2, 3); 
+  glUniform1i(ctx->uniloc.sampler2, 2); 
 
   // Earth
-  glActiveTexture(GL_TEXTURE4);
+  glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, ctx->image[3]->textureId);
-  glUniform1i(ctx->uniloc.sampler2, 4); 
+  glUniform1i(ctx->uniloc.sampler3, 3); 
 
   // Mars
-  glActiveTexture(GL_TEXTURE5);
+  glActiveTexture(GL_TEXTURE4);
   glBindTexture(GL_TEXTURE_2D, ctx->image[4]->textureId);
-  glUniform1i(ctx->uniloc.sampler2, 5); 
+  glUniform1i(ctx->uniloc.sampler4, 4); 
 
   // Jupiter
-  glActiveTexture(GL_TEXTURE6);
+  glActiveTexture(GL_TEXTURE5);
   glBindTexture(GL_TEXTURE_2D, ctx->image[5]->textureId);
-  glUniform1i(ctx->uniloc.sampler2, 6); 
+  glUniform1i(ctx->uniloc.sampler5, 5); 
 
   // Saturn
-  glActiveTexture(GL_TEXTURE7);
+  glActiveTexture(GL_TEXTURE6);
   glBindTexture(GL_TEXTURE_2D, ctx->image[6]->textureId);
-  glUniform1i(ctx->uniloc.sampler2, 7); 
+  glUniform1i(ctx->uniloc.sampler6, 6); 
 
   // Uranus
-  glActiveTexture(GL_TEXTURE8);
+  glActiveTexture(GL_TEXTURE7);
   glBindTexture(GL_TEXTURE_2D, ctx->image[7]->textureId);
-  glUniform1i(ctx->uniloc.sampler2, 8); 
+  glUniform1i(ctx->uniloc.sampler7, 7); 
 
   // Neptune
-  glActiveTexture(GL_TEXTURE9);
+  glActiveTexture(GL_TEXTURE8);
   glBindTexture(GL_TEXTURE_2D, ctx->image[8]->textureId);
-  glUniform1i(ctx->uniloc.sampler2, 9); 
+  glUniform1i(ctx->uniloc.sampler8, 8); 
 
   // Pluto
-  glActiveTexture(GL_TEXTURE10);
+  glActiveTexture(GL_TEXTURE9);
   glBindTexture(GL_TEXTURE_2D, ctx->image[9]->textureId);
-  glUniform1i(ctx->uniloc.sampler2, 10); 
+  glUniform1i(ctx->uniloc.sampler9, 9); 
 
   // NOTE: we must normalize our UVN matrix
   norm_M4(gctx->camera.uvn);
@@ -652,13 +652,7 @@ int contextDraw(context_t *ctx) {
   glUniformMatrix4fv(ctx->uniloc.inverseViewMatrix, 1, GL_FALSE, gctx->camera.inverse_uvn);
   glUniformMatrix4fv(ctx->uniloc.projMatrix, 1, GL_FALSE, gctx->camera.proj);
   glUniform3fv(ctx->uniloc.lightDir, 1, ctx->lightDir);
-  glUniform3fv(ctx->uniloc.spotPoint, 1, ctx->spotlight.from);
-  glUniform3fv(ctx->uniloc.spotUp, 1, ctx->spotlight.up);
-	glUniform1f(ctx->uniloc.penumbra, ctx->spotlight.fov);
-	glUniform1f(ctx->uniloc.rStart, ctx->spotlight.near);
-	glUniform1f(ctx->uniloc.rEnd, ctx->spotlight.far);
   glUniform3fv(ctx->uniloc.lightColor, 1, ctx->lightColor);
-  glUniform1i(ctx->uniloc.gouraudMode, ctx->gouraudMode);
   glUniform1i(ctx->uniloc.seamFix, ctx->seamFix);
 
   for (gi=0; gi<ctx->geomNum; gi++) {
@@ -675,6 +669,7 @@ int contextDraw(context_t *ctx) {
     spotGeomDraw(ctx->geom[gi]);
   }
 
+/*
   // NOTE: update our geom-specific unilocs
   for (gi=sceneGeomOffset; gi<ctx->geomNum; gi++) {
     set_model_transform(modelMat, ctx->geom[gi]);
@@ -693,10 +688,22 @@ int contextDraw(context_t *ctx) {
     glUniform1f(ctx->uniloc.shexp, ctx->geom[gi]->shexp);
     spotGeomDraw(ctx->geom[gi]);
   }
-  
+  */
   /* These lines are also related to using textures.  We finish by
      leaving GL_TEXTURE0 as the active unit since AntTweakBar uses
      that, but doesn't seem to explicitly select it */
+  glActiveTexture(GL_TEXTURE9);
+  glBindTexture(GL_TEXTURE_2D, 9);
+  glActiveTexture(GL_TEXTURE8);
+  glBindTexture(GL_TEXTURE_2D, 8);
+  glActiveTexture(GL_TEXTURE7);
+  glBindTexture(GL_TEXTURE_2D, 7);
+  glActiveTexture(GL_TEXTURE6);
+  glBindTexture(GL_TEXTURE_2D, 6);
+  glActiveTexture(GL_TEXTURE5);
+  glBindTexture(GL_TEXTURE_2D, 5);
+  glActiveTexture(GL_TEXTURE4);
+  glBindTexture(GL_TEXTURE_2D, 4);
   glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, 3);
   glActiveTexture(GL_TEXTURE2);

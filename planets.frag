@@ -39,6 +39,7 @@ void main() {
     // recover theta from the vertex shader
     tc.x = -0.5 * PI_INV * atan(texCoord.z, texCoord.x) ;
     tc.y = texCoord.y;
+//    tc = texCoord.xy;
 
   switch (gi)
   {

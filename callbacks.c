@@ -360,6 +360,7 @@ void callbackMouseButton(int button, int action)
 void callbackMousePos(int xx, int yy)
 {
   GLfloat s[5];
+/*
     // animation
     double toc = spotTime();
     if (gctx->ticMouse == -1)
@@ -367,6 +368,7 @@ void callbackMousePos(int xx, int yy)
 
     // Change in time
     double dt = toc - gctx->ticMouse;
+*/
 
   if (gctx->buttonDown) {
     GLfloat xf = (float) xx / gctx->winSizeX;
@@ -377,7 +379,7 @@ void callbackMousePos(int xx, int yy)
     s[1] = gctx->mouseFun.multiplier * s[1] + gctx->mouseFun.offset;
 
     (gctx->mouseFun.f)(gctx->mouseFun.m, s, gctx->mouseFun.i);
-
+/*
     if (gctx->modelMode && !gctx->shiftDown) {
 			// Change in angle
 			GLfloat dau, dav;
@@ -407,7 +409,7 @@ void callbackMousePos(int xx, int yy)
 		}
 
 //    printf("thetaPerSecond: %.6f, %.6f\n", gctx->thetaPerSecU, gctx->thetaPerSecV);
-
+*/
     // NOTE: We update lastX and lastY in both callbackMouseButton and callbackMousePos; We believe
     //       this produces better motion.
     gctx->lastX = xx;
