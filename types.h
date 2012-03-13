@@ -38,7 +38,7 @@ extern "C" {
 
 enum BumpMappingModes {Disabled, Bump, Parallax};
 enum FilteringModes {Nearest, Linear, NearestWithMipmap, LinearWithMipmap};
-enum Objects {Sphere, Softcube, Cube};
+enum Objects {Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Pluto};
 enum CubeMaps {CubeSample, CubeCool, CubePlace};
 enum Shaders {PhongShader, CubeShader, SpotlightShader};
 

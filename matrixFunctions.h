@@ -36,11 +36,12 @@ void rotate_view_U(GLfloat t);
 void rotate_view_V(GLfloat t);
 void rotate_view_N(GLfloat t);
 
-void rotate_model(spotGeom *obj, GLfloat t, size_t i);
+void rotate_model(spotGeom *obj, GLfloat *axis, GLfloat t);
 void rotate_model_UV(GLfloat x, GLfloat y);
 void rotate_model_U(GLfloat t);
 void rotate_model_V(GLfloat t);
 void rotate_model_N(GLfloat t);
+void rotate_model_ith(spotGeom *obj, GLfloat t, size_t i);
 
 void m_rotate_1st_V3(GLfloat *t, GLfloat *s, size_t i);
 void m_rotate_2nd_V3(GLfloat *t, GLfloat *s, size_t i);

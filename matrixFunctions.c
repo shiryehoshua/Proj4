@@ -163,15 +163,13 @@ void rotate_view_N(GLfloat x)
   SPOT_V3_NORM(gctx->camera.up, temp, l);
 };
 
-void rotate_model(spotGeom *obj, GLfloat t, size_t i) 
+void rotate_model(spotGeom *obj, GLfloat axis[3], GLfloat t) 
 {
-  GLfloat angle, axis[3], quat[4], newquat[4];
+  GLfloat angle, quat[4], newquat[4];
 
   // calculate angle of rotation
   angle = M_PI * 2.0f * t;
 
-  // extract axis of rotation
-  copy_V3(axis, gctx->camera.uvn, i);
   spotAAToQuat(quat, angle, axis);
 
   // apply rotation
@@ -181,23 +179,48 @@ void rotate_model(spotGeom *obj, GLfloat t, size_t i)
 
 void rotate_model_N(GLfloat t)
 {
-  rotate_model(gctx->geom[gctx->gi], -t, 2);
+  GLfloat axis[3];
+
+  // extract axis of rotation
+  copy_V3(axis, gctx->camera.uvn, 2);
+
+  rotate_model(gctx->geom[gctx->gi], axis, -t);
 }
 
 void rotate_model_V(GLfloat t)
 {
-  rotate_model(gctx->geom[gctx->gi], -t, 1);
+  GLfloat axis[3];
+
+  // extract axis of rotation
+  copy_V3(axis, gctx->camera.uvn, 1);
+
+  rotate_model(gctx->geom[gctx->gi], axis, -t);
 }
 
 void rotate_model_U(GLfloat t)
 {
-  rotate_model(gctx->geom[gctx->gi], -t, 0);
+  GLfloat axis[3];
+
+  // extract axis of rotation
+  copy_V3(axis, gctx->camera.uvn, 0);
+
+  rotate_model(gctx->geom[gctx->gi], axis, -t);
 }
 
 void rotate_model_UV(GLfloat x, GLfloat y)
 {
   rotate_model_U(y);
   rotate_model_V(x);
+}
+
+void rotate_model_ith(spotGeom *obj, GLfloat t, size_t i)
+{
+  GLfloat axis[3];
+
+  axis[0] = axis[1] = axis[3] = 0;
+  axis[i] = 1;
+
+  rotate_model(obj, axis, t);
 }
 
 /* Wrapped functions to be passed to mouseFun.f */

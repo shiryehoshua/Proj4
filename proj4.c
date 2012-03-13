@@ -41,9 +41,16 @@ TwEnumVal twBumpMappingModesEV[]={{Disabled, "Disabled"},
                                   {Linear, "Linear"},
                                   {NearestWithMipmap, "NearestWithMipmap"},
                                   {LinearWithMipmap, "LinearWithMipmap"}},
-          twObjectsEV[]          ={{Sphere, "Sphere"},
-                                  {Softcube, "Softcube"},
-                                  {Cube, "Cube"}},
+          twObjectsEV[]          ={{Sun, "Sun"},
+                                  {Mercury, "Mercury"},
+                                  {Venus, "Venus"},
+                                  {Earth, "Earth"},
+                                  {Mars, "Mars"},
+                                  {Jupiter, "Jupiter"},
+                                  {Saturn, "Saturn"},
+                                  {Uranus, "Uranus"},
+                                  {Neptune, "Neptune"},
+                                  {Pluto, "Pluto"}},
           twCubeMapsEV[]         ={{CubeSample, "cube-sample.png"},
                                   {CubeCool, "cube-cool.png"},
                                   {CubePlace, "cube-place.png"}},
@@ -214,6 +221,18 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     translateGeomU(ctx->geom[8],  11.75f); // Neptune 
     translateGeomU(ctx->geom[9],  15.84f); // Pluto 
 
+    // set axialThetaPerSec
+    ctx->geom[0]->axialThetaPerSec = 0.01f;
+    ctx->geom[1]->axialThetaPerSec = 0.01f; 
+    ctx->geom[2]->axialThetaPerSec = 0.01f; 
+    ctx->geom[3]->axialThetaPerSec = 0.01f; 
+    ctx->geom[4]->axialThetaPerSec = 0.01f; 
+    ctx->geom[5]->axialThetaPerSec = 0.01f; 
+    ctx->geom[6]->axialThetaPerSec = 0.01f; 
+    ctx->geom[7]->axialThetaPerSec = 0.01f; 
+    ctx->geom[8]->axialThetaPerSec = 0.01f; 
+    ctx->geom[9]->axialThetaPerSec = 0.01f; 
+
     // scale the objects so that they resemble true dimensions
     scaleGeom(ctx->geom[0], 2.000f); // Sun
     scaleGeom(ctx->geom[1], 0.035f); // Mercury
@@ -251,7 +270,7 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   ctx->thetaPerSecU = 0;
   ctx->thetaPerSecV = 0;
   ctx->thetaPerSecN = 0;
-	ctx->onlyN = 0;
+  ctx->onlyN = 0;
 
 //	ctx->cubeMapId = 2;
 
@@ -566,7 +585,7 @@ int contextDraw(context_t *ctx) {
   gctx->angleV = (thetaPerSecV * dt) * 0.1;
   gctx->angleN = (thetaPerSecN * dt) * 0.1;
   rotate_model_UV(gctx->angleU, -gctx->angleV);
-	rotate_model_N(-gctx->angleN);
+  rotate_model_N(-gctx->angleN);
 
   /* re-assert which program is being used (AntTweakBar uses its own) */
   glUseProgram(ctx->program); 
@@ -656,10 +675,13 @@ int contextDraw(context_t *ctx) {
   glUniform1i(ctx->uniloc.seamFix, ctx->seamFix);
 
   for (gi=0; gi<ctx->geomNum; gi++) {
+    // have each planet rotate accordingly
+    rotate_model_ith(ctx->geom[gi], ctx->geom[gi]->axialThetaPerSec, 1); 
+
     set_model_transform(modelMat, ctx->geom[gi]);
     glUniformMatrix4fv(ctx->uniloc.modelMatrix, 
                        1, GL_FALSE, modelMat);
-    updateNormals(gctx->geom[gi]->normalMatrix, modelMat);
+    updateNormals(ctx->geom[gi]->normalMatrix, modelMat);
     glUniformMatrix3fv(ctx->uniloc.normalMatrix,
                        1, GL_FALSE, ctx->geom[gi]->normalMatrix);
     glUniform3fv(ctx->uniloc.objColor, 1, ctx->geom[gi]->objColor);
@@ -822,14 +844,35 @@ static void TW_CALL getShaderCallback(void *value, void *clientData) {
 static void TW_CALL setObjectCallback(const void *value, void *clientData) {
 	enum Objects object = *((const enum Objects *) value);
 	switch (object) {
-		case Sphere:
+		case Sun:
 			gctx->gi = 0;
 			break;
-		case Softcube:
+		case Mercury:
 			gctx->gi = 1;
 			break;
-		case Cube:
+		case Venus:
 			gctx->gi = 2;
+			break;
+		case Earth:
+			gctx->gi = 3;
+			break;
+		case Mars:
+			gctx->gi = 4;
+			break;
+		case Jupiter:
+			gctx->gi = 5;
+			break;
+		case Saturn:
+			gctx->gi = 6;
+			break;
+		case Uranus:
+			gctx->gi = 7;
+			break;
+		case Neptune:
+			gctx->gi = 8;
+			break;
+		case Pluto:
+			gctx->gi = 9;
 			break;
 	}
 }
@@ -892,10 +935,10 @@ int updateTweakBarVars(int scene) {
                              twShaders, setShaderCallback,
                              getShaderCallback, &(gctx->program),
                              " label='shader'"); */
-  if (!EE) EE |= !TwAddVarCB(gctx->tbar, "object",
+  if (!EE) EE |= !TwAddVarCB(gctx->tbar, "planet",
                              twObjects, setObjectCallback,
                              getObjectCallback, &(gctx->gi),
-                             " label='object'");
+                             " label='planet'");
 /*  if (!EE) EE |= !TwAddVarCB(gctx->tbar, "cubemap",
                              twCubeMaps, setCubeMapCallback,
                              getCubeMapCallback, &(gctx->cubeMapId),
@@ -951,7 +994,7 @@ int createTweakBar(context_t *ctx, int scene) {
   // NOTE: these are nice to have
   twBumpMappingModes=TwDefineEnum("BumpMappingModes", twBumpMappingModesEV, 3);
   twFilteringModes=TwDefineEnum("FilteringModes", twFilteringModesEV, 4);
-  twObjects=TwDefineEnum("Objects", twObjectsEV, 3);
+  twObjects=TwDefineEnum("Objects", twObjectsEV, 10);
   twCubeMaps=TwDefineEnum("CubeMap", twCubeMapsEV, 3);
   twShaders=TwDefineEnum("Shader", twShadersEV, 3);
   
