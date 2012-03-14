@@ -118,28 +118,12 @@ void callbackKeyboard(int key, int action)
 
       // Rotate around the U-axis of the viewport
       case UP:
-        v = 0.125;
-        if (gctx->modelMode) {
-          rotate_model_U(0.05);
-				} else if (gctx->lightMode) {
-          rotate_spotlight_U(v);
-        } else {
-          rotate_view_U(v);
-          rotate_spotlight_U(v);
-        }
+        updateScene(gctx->time, 1);
         break;
 
       // Rotate around the U-axis of the viewport
       case DOWN:
-        v= -0.125;
-        if (gctx->modelMode) {
-          rotate_model_U(-0.05);
-        } else if (gctx->lightMode) {
-					rotate_spotlight_U(v);
-				} else {
-          rotate_view_U(v);
-					rotate_spotlight_U(v);
-        }
+        updateScene(gctx->time, -1);
         break;
 
       // Rotate around the V-axis of the viewport
