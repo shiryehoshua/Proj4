@@ -100,6 +100,7 @@ void copy_3rd_V3(GLfloat n[3], GLfloat uvn[4*4]);
 void updateUVN(GLfloat uvn[4*4], GLfloat at[3], GLfloat from[3], GLfloat up[3]);
 void inverseUVN(GLfloat inverse_uvn[4*4], GLfloat uvn[4*4]);
 void updateProj(GLfloat m[4*4], GLfloat w, GLfloat h, GLfloat n, GLfloat f, int ortho);
+void updateScene(GLfloat time, GLfloat dt);
 
 void updateNormals(GLfloat n[4*4], GLfloat m[3*3]);
 

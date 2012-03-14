@@ -664,6 +664,24 @@ void updateNormals(GLfloat n[4*4], GLfloat m[3*3])
   SPOT_M3_TRANSPOSE(n, mat2);
 }
 
+/* updateScene: to be called with each animation */
+void updateScene(GLfloat time, GLfloat dt)
+{
+  int gi;
+
+  // update each planet
+  for (gi = 0; gi < gctx->geomNum; gi++) {
+    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->axialThetaPerSec * dt, 1);
+
+    if (gi != 0) {
+      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, gctx->geom[gi]->orbitThetaPerSec * dt);
+    }
+  }
+
+  gctx->time += dt;
+  if (gctx->time >= 5.0) { gctx->time = 0.0f; }
+}
+
 /* Normalize homogenous coordinates */
 
 void norm_M4(GLfloat m[4*4])
