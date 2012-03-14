@@ -25,7 +25,7 @@ extern "C" {
 #define TBAR_NAME "Project2-Params"
 
 // NOTE: Shaders are populated in our main
-#define NUM_PROGRAMS 0
+#define NUM_PROGRAMS 7
 // NOTE: easy program lookup--refer to programIds[ID_${shader}] for the id to use with
 //       `glLinkProgram'
 #define ID_CUBE 0
@@ -35,6 +35,7 @@ extern "C" {
 #define ID_BUMP 4
 #define ID_PARALLAX 5
 #define ID_SPOTLIGHT 6
+#define ID_PLANETS 7
 
 enum BumpMappingModes {Disabled, Bump, Parallax};
 enum FilteringModes {Nearest, Linear, NearestWithMipmap, LinearWithMipmap};
