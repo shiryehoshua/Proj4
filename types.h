@@ -172,7 +172,8 @@ typedef struct {
     perVertexTexturingMode,
     seamFix,
     spinning,
-		cubeMapId;
+    paused,
+    cubeMapId;
   enum BumpMappingModes bumpMappingMode;
   enum FilteringModes filteringMode;
   GLint minFilter, magFilter;
@@ -188,11 +189,12 @@ typedef struct {
     ticMouse;             /* last abs time callbackMousePos was called */
   GLfloat thetaPerSecU,   /* radians per second along U */
     thetaPerSecV,         /* radians per second along V */
-		thetaPerSecN;
+    thetaPerSecN;
+  GLfloat time;
   GLfloat angleU,         /* abs angle of beam along U */
     angleV,               /* abs angle of beam along V */
-		angleN;
-	int onlyN;
+    angleN;
+  int onlyN;
 } context_t;
 
 #ifdef __cplusplus

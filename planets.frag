@@ -91,15 +91,19 @@ void main() {
      
   }
 
-  // Phong Shading
-  vec3 diff = Kd * max(0.0, dot(vnrm, sunLight)) * c.rgb;
-  vec3 amb = Ka * c.rgb;
+  if (gi != 0) {
+    // Phong Shading
+    vec3 diff = Kd * max(0.0, dot(vnrm, sunLight)) * c.rgb;
+    vec3 amb = Ka * c.rgb;
 
-  vec3 r = normalize(reflect(-normalize(sunLight), normalize(vnrm)));
-  float vnrmdotr = max(0.0, dot(normalize(vnrm), r));
-  vec3 spec = Ks * pow(vnrmdotr, shexp) * lightColor;
+    vec3 r = normalize(reflect(-normalize(sunLight), normalize(vnrm)));
+    float vnrmdotr = max(0.0, dot(normalize(vnrm), r));
+    vec3 spec = Ks * pow(vnrmdotr, shexp) * lightColor;
+    color.rgb = diff + amb + spec;
+  } else {
+    color.rgb = c.rgb; 
+  }
 
-  color.rgb = diff + amb + spec;
   color.a = 1.0;
 
 }

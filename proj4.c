@@ -276,6 +276,7 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     // set orientation
     for (gi=0; gi < geomNum; gi ++) {
       SPOT_V4_SET(ctx->geom[gi]->quaternion, 1.0f, 0.0f, 0.0f, 0.0f);
+      rotate_model_ith(ctx->geom[gi], 0.75, 0);
       ctx->geom[gi]->Kd = 0.4;
       ctx->geom[gi]->Ks = 0.3;
       ctx->geom[gi]->Ka = 0.3;
@@ -471,9 +472,11 @@ int contextGLInit(context_t *ctx) {
   gctx->gouraudMode = 1;
   gctx->seamFix = 0;
   gctx->spinning = 0;
+  gctx->paused = 0;
   gctx->minFilter = GL_NEAREST;
   gctx->magFilter = GL_NEAREST;
   gctx->perVertexTexturingMode=0; 
+  gctx->time = 0.0f;
 //  perVertexTexturing();
 
   // NOTE: model initializations
@@ -703,12 +706,14 @@ int contextDraw(context_t *ctx) {
   glUniform1i(ctx->uniloc.seamFix, ctx->seamFix);
 
   for (gi=0; gi<ctx->geomNum; gi++) {
-    // have each planet rotate accordingly
-    rotate_model_ith(ctx->geom[gi], ctx->geom[gi]->axialThetaPerSec, 1); 
+    if (!gctx->paused) {
+      // have each planet rotate accordingly
+      rotate_model_ith(ctx->geom[gi], ctx->geom[gi]->axialThetaPerSec, 1); 
 
-    // have each planet orbit accordingly
-    if (gi != 0) {
-      orbit(ctx->geom[gi], ctx->geom[gi]->orbitAxis, ctx->geom[gi]->orbitThetaPerSec);
+      // have each planet orbit accordingly
+      if (gi != 0) {
+        orbit(ctx->geom[gi], ctx->geom[gi]->orbitAxis, ctx->geom[gi]->orbitThetaPerSec);
+      }
     }
 
     set_model_transform(modelMat, ctx->geom[gi]);
@@ -1170,6 +1175,12 @@ int main(int argc, const char* argv[]) {
   while (gctx->running) {
     // NOTE: we update UVN every step
     updateUVN(gctx->camera.uvn, gctx->camera.at, gctx->camera.from, gctx->camera.up);
+
+    // Update time
+    if (!gctx->paused) {
+      gctx->time += 0.1;
+      if (gctx->time == 10) { gctx->time = 0; }
+    }
     /* render */
     if (contextDraw(gctx)) {
       fprintf(stderr, "%s: trouble drawing:\n", me);

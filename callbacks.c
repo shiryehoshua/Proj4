@@ -28,6 +28,7 @@ extern int sceneGeomOffset;
 #define DOWN 284
 #define LEFT 285
 #define RIGHT 286
+#define SPACE 32
 void callbackKeyboard(int key, int action)
 {
   /* give AntTweakBar first pass at handling with key event */
@@ -212,6 +213,9 @@ void callbackKeyboard(int key, int action)
         fprintf(stderr, "Setting scene 4");
         break;
 
+      case SPACE:
+        gctx->paused ^= 1; 
+
       // Print keycode for debugging purposes
       default:
         fprintf(stderr, "Caught key code: %d\n", key);
@@ -288,7 +292,7 @@ void callbackMouseButton(int button, int action)
           printf(" ... (move V) translates eye and look-at along N\n");
           gctx->mouseFun.m = gctx->camera.uvn; // Never accessed
           gctx->mouseFun.f = translate_view_N;
-          gctx->mouseFun.multiplier = -1;
+          gctx->mouseFun.multiplier = -20;
         }
       }
     } else if (xf < FIFTH) {
