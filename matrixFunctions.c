@@ -662,13 +662,14 @@ void updateScene(GLfloat time, GLfloat dt)
   GLfloat d=50.0; // dist
   GLfloat r=(2.0 * M_PI);
   GLfloat t;
+  GLfloat P1[3], P2[3], P3[3], P4[3], P5[3];
 
   // update each planet
   for (gi = 0; gi < gctx->geomNum; gi++) {
-    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->rotationPeriod * (dt/1), 1);
+    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->rotationPeriod * dt, 1);
 
     if (gi != 0) {
-      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, (1/gctx->geom[gi]->orbitalPeriod) * (dt/1));
+      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, (1/gctx->geom[gi]->orbitalPeriod) * dt);
     }
   }
 
@@ -680,7 +681,7 @@ void updateScene(GLfloat time, GLfloat dt)
   } else {
     gctx->time = time;
   }
-
+/*
   // SPLINE from keyframe 0 => 2
     t = dt * r; // 1x dist. w/ 2x time
   if (round(time)>=0 && ceil(time)<=2.5) {
@@ -692,14 +693,56 @@ void updateScene(GLfloat time, GLfloat dt)
   if (round(time)>=2.5 && ceil(time)<=5) {
     rotate_view_U(2*t);
   }
-
+*/
   // SPLINE to move camera position
   P1[0] = P1[1] = P1[2] = 0; // Start at zero
-  P2[0] = 1.0; P2[1] = 0.0; P2[2] = 0.0; 
-  P3[0] = 5.0; P3[1] = -1.0; P3[2] = 0.0; 
-  P4[0] = 5.0; P4[1] = 5.0; P4[2] = 0.0; 
-  P5[0] = 5.0; P5[1] = 5.0; P5[2] = -1.0; 
+  P2[0] = 10.0; P2[1] = 0.0; P2[2] = 20.0; 
+  P3[0] = 40.0; P3[1] = 0.0; P3[2] = 20.0; 
+  P4[0] = 0.0; P4[1] = 0.0; P4[2] = 20.0; 
+  P5[0] = 0.0; P5[1] = 0.0; P5[2] = 20.0; 
 
+  // set new camera.from to h1*P1 (= 0) + h2*P2 + h3*P3 + h4*P4 + h5*P5
+  GLfloat s = time / 5;
+  GLfloat h2 = 2*s*s*s - 3*s*s + 1;
+  GLfloat h3 = -2*s*s*s + 3*s*s;
+  GLfloat h4 = s*s*s - 2*s*s + s;
+  GLfloat h5 = s*s*s - s*s;
+
+  GLfloat a1[3], a2[3], a3[3], a4[3];
+  GLfloat temp1[3], temp2[3];
+  SPOT_V3_COPY(a1, P2);
+  
+  SPOT_V3_SUB(a2, P3, P1);
+  SPOT_V3_SCALE(a2, s, a2);
+
+  SPOT_V3_SCALE(temp1, 2, P1);
+  SPOT_V3_SCALE(temp2, -5, P2);
+  SPOT_V3_ADD(a3, temp1, temp2);
+  SPOT_V3_SCALE(temp1, 4, P3);
+  SPOT_V3_SUB(temp2, temp1, P3);
+  SPOT_V3_ADD(a3, a3, temp2);
+  SPOT_V3_SCALE(a3, s*s, a3);
+
+  SPOT_V3_SCALE(temp1, 3, P2);
+  SPOT_V3_SUB(a4, temp1, P1);
+  SPOT_V3_SCALE(temp1, 3, P3);
+  SPOT_V3_SUB(temp2, P3, temp1);
+  SPOT_V3_ADD(a4, a4, temp2);
+  SPOT_V3_SCALE(a4, s*s*s, a4); 
+
+/*
+  SPOT_V3_SCALE(P2, h2, P2); 
+  SPOT_V3_SCALE(P3, h3, P3); 
+  SPOT_V3_SCALE(P4, h4, P4); 
+  SPOT_V3_SCALE(P5, h5, P5); 
+*/
+  SPOT_V3_ADD(temp1, a1, a2);
+  SPOT_V3_ADD(temp2, temp1, a3);
+  SPOT_V3_ADD(temp1, temp2, a4);
+
+  fprintf(stderr, "new camera at: %f, %f, %f and s: %f\n", temp2[0], temp2[1], temp2[2], s);
+
+  SPOT_V3_COPY(gctx->camera.from, temp1);
 
   //printf("Time: %f\n", gctx->time);
 
