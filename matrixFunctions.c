@@ -675,8 +675,8 @@ void updateScene(GLfloat time, GLfloat dt)
 
   time += dt;
 	GLfloat rem = 0;
-  if (time >= 5.0) {
-    gctx->time = rem = time - 5.0f;
+  if (time >= 50.0) {
+    gctx->time = rem = time - 50.0f;
     printf("Rem: %f\n", rem);
   } else {
     gctx->time = time;
@@ -695,14 +695,13 @@ void updateScene(GLfloat time, GLfloat dt)
   }
 */
   // SPLINE to move camera position
-  P1[0] = P1[1] = P1[2] = 0; // Start at zero
-  P2[0] = 10.0; P2[1] = 0.0; P2[2] = 20.0; 
-  P3[0] = 40.0; P3[1] = 0.0; P3[2] = 20.0; 
-  P4[0] = 0.0; P4[1] = 0.0; P4[2] = 20.0; 
-  P5[0] = 0.0; P5[1] = 0.0; P5[2] = 20.0; 
+  P2[0] = 5.0; P2[1] = 0.0; P2[2] = 20.0; 
+  P2[0] = 40.0; P2[1] = 0.0; P2[2] = 20.0; 
+  P3[0] = 10.0; P3[1] = 0.0; P3[2] = 20.0; 
+  P4[0] = 5.0; P4[1] = 0.0; P4[2] = 20.0; 
 
   // set new camera.from to h1*P1 (= 0) + h2*P2 + h3*P3 + h4*P4 + h5*P5
-  GLfloat s = time / 5;
+  GLfloat s = time / 50;
   GLfloat h2 = 2*s*s*s - 3*s*s + 1;
   GLfloat h3 = -2*s*s*s + 3*s*s;
   GLfloat h4 = s*s*s - 2*s*s + s;
