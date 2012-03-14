@@ -589,7 +589,7 @@ int contextDraw(context_t *ctx) {
   ctx->ticDraw = toc;
 
   if (!gctx->paused) {
-    updateScene(gctx->time, dt);
+    updateScene(gctx->time, 0.25*dt);
   }
 
   // NOTE: we must normalize our UVN matrix
