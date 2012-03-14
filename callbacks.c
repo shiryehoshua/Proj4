@@ -15,7 +15,6 @@
 extern context_t *gctx;
 extern void setScene(int i);
 extern int contextDraw(context_t *ctx);
-extern int perVertexTexturing();
 extern void setUnilocs();
 extern int programIds[NUM_PROGRAMS+1];
 extern const char *vertFnames[NUM_PROGRAMS], *fragFnames[NUM_PROGRAMS];
@@ -169,52 +168,9 @@ void callbackKeyboard(int key, int action)
         }
         break;
 
-      // Describe and display scene 1
-      case '1':
-        sceneGeomOffset=0;
-        gctx->program=programIds[ID_PHONG];
-        gctx->gouraudMode=1;
-        setUnilocs();
-        updateTweakBarVars(1);
-        fprintf(stderr, "Setting scene 1: Demonstrating model, view and orthographic view transoforms\n");
-        break;
-
-      // Describe and display scene 2
-      case '2':
-        gctx->geom[0]->Ka=0.3;
-        sceneGeomOffset=0;
-        gctx->seamFix = 0;
-        gctx->perVertexTexturingMode = 1;
-        perVertexTexturing();
-        gctx->program=programIds[ID_SIMPLE];
-        setUnilocs();
-        updateTweakBarVars(2);
-        fprintf(stderr, "Setting scene 2: Demonstrating perspective transform\n");
-        break;
-
-      // Describe and display scene 3
-      case '3':
-        gctx->minFilter = GL_NEAREST;
-        gctx->magFilter = GL_NEAREST;
-        sceneGeomOffset=1;
-        gctx->filteringMode = Nearest;
-        gctx->program=programIds[ID_TEXTURE];
-        setUnilocs();
-        updateTweakBarVars(3);
-        fprintf(stderr, "Setting scene 3: filtering modes\n"); 
-        break;
-
-      case '4':
-        sceneGeomOffset=0;
-        gctx->bumpMappingMode=Disabled;
-        gctx->program=programIds[ID_TEXTURE];
-        setUnilocs();
-        updateTweakBarVars(4);
-        fprintf(stderr, "Setting scene 4");
-        break;
-
       case SPACE:
         gctx->paused ^= 1; 
+        break;
 
       // Print keycode for debugging purposes
       default:

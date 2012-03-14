@@ -62,68 +62,6 @@ TwEnumVal twBumpMappingModesEV[]={{Disabled, "Disabled"},
 // NOTE: we'd prefer to only draw one shape at a time, while keeping a sphere and
 //       square in memory. This variable gets referenced in contextDraw and does just
 //       that...
-int sceneGeomOffset=0;
-
-// NOTE: the following supports per-vertex texturing. We set the RGB values at each vertex, and
-//       our shaders linearly interpolate the values, giving it a (sick) low-res look
-int perVertexTexturing() {
-  int i, v;
-  if (gctx->perVertexTexturingMode) {
-    // We are coloring the vertices for each geom
-    for (i=0; i<gctx->geomNum; i++) {
-      int sizeC=gctx->image[i]->sizeC,            // channel size (e.g., 8- or 16-bit?)
-          maxVal=sizeC==1?UCHAR_MAX:USHRT_MAX,    // max value of a channel (e.g. 255)
-          sizeX=gctx->image[i]->sizeX,            // width of image, aka number of columns
-          sizeY=gctx->image[i]->sizeY,            // height of image, aka number of rows
-          sizeP=gctx->image[i]->sizeP,            // sizeP == number of channels (e.g., 3 for RGB)
-          sizeOfPixel=sizeP*sizeC,                // sizeOfPixel == num of channels * channel size
-          sizeOfRow=sizeX*sizeOfPixel;            // sizeOfRow (for the img_y offset)
-      // NOTE: even though we are casting data.us to an array of unsigned chars, we explicitly
-      //       handle the memory locations, so this is not a trip-up
-      unsigned char *data = sizeC==1 ? gctx->image[i]->data.uc
-        : (unsigned char*) gctx->image[i]->data.us;
-      // NOTE: now we cycle through the vertices of the i-th geom, converting each vertex's
-      //       texture coordinates into pixel coordinates, and finally into in-image memory
-      //       locations; then we write the vertex's RGB component, transformed from the range of
-      //       (0,maxVal) to (0.0,1.0)
-      for (v=0; v<gctx->geom[i]->vertNum; v++) {
-        GLfloat s=gctx->geom[i]->tex2[2*v],       // (s,t) texture coordinates of a vertex, v
-                t=gctx->geom[i]->tex2[2*v+1];
-        int x=s*(sizeX-1),                        // (x,y) location of a pixel in the image
-            y=t*(sizeY-1),
-            img_x=x*sizeOfPixel,                  // memory location of the (x,y) pixel, given the
-            img_y=y*sizeOfRow;                    // size of a pixel
-        // NOTE: array indexing in the following way is much clearer than the bracket notation for
-        //       this application; we are dealing with images of differing bits, so it's better to
-        //       just add up the offsets explicitly defined above
-        GLfloat r=(float)(*(data+img_y+img_x+sizeC*0))/maxVal, // scale these from the (0,maxVal)
-                g=(float)(*(data+img_y+img_x+sizeC*1))/maxVal, // to (0.0,1.0)
-                b=(float)(*(data+img_y+img_x+sizeC*2))/maxVal;
-        // Set the vertex-specific RGB values
-        gctx->geom[i]->rgb[v*3+0]=r;
-        gctx->geom[i]->rgb[v*3+1]=g;
-        gctx->geom[i]->rgb[v*3+2]=b;
-      }
-      // NOTE: we need to update the OpenGL buffer location for this geom's per-vertex RGB values,
-      //       otherwise none of this work will be evident in the shaders
-      glBindBuffer(GL_ARRAY_BUFFER, gctx->geom[i]->rgbBuffId);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*gctx->geom[i]->vertNum*3, gctx->geom[i]->rgb,
-          GL_STATIC_DRAW);
-    }
-  } else {
-    // NOTE: we reset the per-vertex RGB values for each geom to 1
-    for (i=0; i<gctx->geomNum; i++) {
-      for (v=0; v<gctx->geom[i]->vertNum; v++)
-        gctx->geom[i]->rgb[v*3+0]=gctx->geom[i]->rgb[v*3+1]=gctx->geom[i]->rgb[v*3+2]=1;
-      // NOTE: we need to update the OpenGL buffer location for this geom's per-vertex RGB values,
-      //       otherwise none of this work will be evident in the shaders
-      glBindBuffer(GL_ARRAY_BUFFER, gctx->geom[i]->rgbBuffId);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*gctx->geom[i]->vertNum*3, gctx->geom[i]->rgb,
-          GL_STATIC_DRAW);
-    }
-  }
-  return gctx->perVertexTexturingMode;
-}
 
 /* Creates a context around geomNum spotGeom's and
    imageNum spotImage's */
@@ -181,118 +119,114 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   ctx->shiftDown = 0;
   ctx->Zspread = 0.003;
 
-  fprintf(stderr, "about to create objs\n");
+  // create the objects
+  ctx->geom[0] = spotGeomNewSphere(); // Sun
+  ctx->geom[1] = spotGeomNewSphere(); // Mercury
+  ctx->geom[2] = spotGeomNewSphere(); // Venus
+  ctx->geom[3] = spotGeomNewSphere(); // Earth
+  ctx->geom[4] = spotGeomNewSphere(); // Mars
+  ctx->geom[5] = spotGeomNewSphere(); // Jupiter
+  ctx->geom[6] = spotGeomNewSphere(); // Saturn
+  ctx->geom[7] = spotGeomNewSphere(); // Uranus
+  ctx->geom[8] = spotGeomNewSphere(); // Neptune
+  ctx->geom[9] = spotGeomNewSphere(); // Pluto
 
-    // create the objects
-    ctx->geom[0] = spotGeomNewSphere(); // Sun
-    ctx->geom[1] = spotGeomNewSphere(); // Mercury
-    ctx->geom[2] = spotGeomNewSphere(); // Venus
-    ctx->geom[3] = spotGeomNewSphere(); // Earth
-    ctx->geom[4] = spotGeomNewSphere(); // Mars
-    ctx->geom[5] = spotGeomNewSphere(); // Jupiter
-    ctx->geom[6] = spotGeomNewSphere(); // Saturn
-    ctx->geom[7] = spotGeomNewSphere(); // Uranus
-    ctx->geom[8] = spotGeomNewSphere(); // Neptune
-    ctx->geom[9] = spotGeomNewSphere(); // Pluto
+  // color the objects
+  SPOT_V3_SET(ctx->geom[0]->objColor, 1.0f, 0.5f, 0.0f); // Sun
+  SPOT_V3_SET(ctx->geom[1]->objColor, 0.8f, 0.8f, 0.8f); // Mercury
+  SPOT_V3_SET(ctx->geom[2]->objColor, 0.7f, 0.7f, 1.0f); // Venus
+  SPOT_V3_SET(ctx->geom[3]->objColor, 0.1f, 0.7f, 1.0f); // Earth
+  SPOT_V3_SET(ctx->geom[4]->objColor, 1.0f, 0.5f, 0.0f); // Mars
+  SPOT_V3_SET(ctx->geom[5]->objColor, 1.0f, 0.7f, 0.1f); // Jupiter
+  SPOT_V3_SET(ctx->geom[6]->objColor, 0.8f, 0.8f, 1.0f); // Saturn
+  SPOT_V3_SET(ctx->geom[7]->objColor, 0.2f, 0.8f, 1.0f); // Uranus
+  SPOT_V3_SET(ctx->geom[8]->objColor, 1, 1, 0); // Neptune
+  SPOT_V3_SET(ctx->geom[9]->objColor, 1, 1, 0); // Pluto
 
-  fprintf(stderr, "created objs\n");
+  // set object radius
+  ctx->geom[0]->radius = 0.000f;
+  ctx->geom[1]->radius = 2.105f;
+  ctx->geom[2]->radius = 2.322f; 
+  ctx->geom[3]->radius = 2.500f;
+  ctx->geom[4]->radius = 2.838f;
+  ctx->geom[5]->radius = 5.210f;
+  ctx->geom[6]->radius = 8.007f;
+  ctx->geom[7]->radius = 12.23f;
+  ctx->geom[8]->radius = 14.25f;
+  ctx->geom[9]->radius = 18.34f;
 
-    // color the objects
-    SPOT_V3_SET(ctx->geom[0]->objColor, 1.0f, 0.5f, 0.0f); // Sun
-    SPOT_V3_SET(ctx->geom[1]->objColor, 0.8f, 0.8f, 0.8f); // Mercury
-    SPOT_V3_SET(ctx->geom[2]->objColor, 0.7f, 0.7f, 1.0f); // Venus
-    SPOT_V3_SET(ctx->geom[3]->objColor, 0.1f, 0.7f, 1.0f); // Earth
-    SPOT_V3_SET(ctx->geom[4]->objColor, 1.0f, 0.5f, 0.0f); // Mars
-    SPOT_V3_SET(ctx->geom[5]->objColor, 1.0f, 0.7f, 0.1f); // Jupiter
-    SPOT_V3_SET(ctx->geom[6]->objColor, 0.8f, 0.8f, 1.0f); // Saturn
-    SPOT_V3_SET(ctx->geom[7]->objColor, 0.2f, 0.8f, 1.0f); // Uranus
-    SPOT_V3_SET(ctx->geom[8]->objColor, 1, 1, 0); // Neptune
-    SPOT_V3_SET(ctx->geom[9]->objColor, 1, 1, 0); // Pluto
+  // set object orbit axis
+  SPOT_V3_SET(ctx->geom[0]->orbitAxis, 0.0f, 0.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[1]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[2]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[3]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[4]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[5]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[6]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[7]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[8]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[9]->orbitAxis, 0.0f, 1.0f, 0.0f); 
 
-    // set object radius
-    ctx->geom[0]->radius = 0.000f;
-    ctx->geom[1]->radius = 2.105f;
-    ctx->geom[2]->radius = 2.322f; 
-    ctx->geom[3]->radius = 2.500f;
-    ctx->geom[4]->radius = 2.838f;
-    ctx->geom[5]->radius = 5.210f;
-    ctx->geom[6]->radius = 8.007f;
-    ctx->geom[7]->radius = 12.23f;
-    ctx->geom[8]->radius = 14.25f;
-    ctx->geom[9]->radius = 18.34f;
+  for (gi=0; gi < geomNum; gi ++) {
+    translateGeomU(ctx->geom[gi], ctx->geom[gi]->radius);
+  }
 
-    // set object orbit axis
-    SPOT_V3_SET(ctx->geom[0]->orbitAxis, 0.0f, 0.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[1]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[2]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[3]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[4]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[5]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[6]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[7]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[8]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-    SPOT_V3_SET(ctx->geom[9]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  // set axialThetaPerSec
+  ctx->geom[0]->axialThetaPerSec = 0.01f;
+  ctx->geom[1]->axialThetaPerSec = 0.01f; 
+  ctx->geom[2]->axialThetaPerSec = 0.01f; 
+  ctx->geom[3]->axialThetaPerSec = 0.01f; 
+  ctx->geom[4]->axialThetaPerSec = 0.01f; 
+  ctx->geom[5]->axialThetaPerSec = 0.01f; 
+  ctx->geom[6]->axialThetaPerSec = 0.01f; 
+  ctx->geom[7]->axialThetaPerSec = 0.01f; 
+  ctx->geom[8]->axialThetaPerSec = 0.01f; 
+  ctx->geom[9]->axialThetaPerSec = 0.01f; 
 
-    for (gi=0; gi < geomNum; gi ++) {
-      translateGeomU(ctx->geom[gi], ctx->geom[gi]->radius);
-    }
+  // set orbitThetaPerSec
+  ctx->geom[0]->orbitThetaPerSec = 0.01f;
+  ctx->geom[1]->orbitThetaPerSec = 0.01f;
+  ctx->geom[2]->orbitThetaPerSec = 0.01f;
+  ctx->geom[3]->orbitThetaPerSec = 0.01f;
+  ctx->geom[4]->orbitThetaPerSec = 0.01f;
+  ctx->geom[5]->orbitThetaPerSec = 0.01f;
+  ctx->geom[6]->orbitThetaPerSec = 0.01f;
+  ctx->geom[7]->orbitThetaPerSec = 0.01f;
+  ctx->geom[8]->orbitThetaPerSec = 0.01f;
+  ctx->geom[9]->orbitThetaPerSec = 0.01f;
 
-    // set axialThetaPerSec
-    ctx->geom[0]->axialThetaPerSec = 0.01f;
-    ctx->geom[1]->axialThetaPerSec = 0.01f; 
-    ctx->geom[2]->axialThetaPerSec = 0.01f; 
-    ctx->geom[3]->axialThetaPerSec = 0.01f; 
-    ctx->geom[4]->axialThetaPerSec = 0.01f; 
-    ctx->geom[5]->axialThetaPerSec = 0.01f; 
-    ctx->geom[6]->axialThetaPerSec = 0.01f; 
-    ctx->geom[7]->axialThetaPerSec = 0.01f; 
-    ctx->geom[8]->axialThetaPerSec = 0.01f; 
-    ctx->geom[9]->axialThetaPerSec = 0.01f; 
+  // scale the objects so that they resemble true dimensions
+  scaleGeom(ctx->geom[0], 2.000f); // Sun
+  scaleGeom(ctx->geom[1], 0.035f); // Mercury
+  scaleGeom(ctx->geom[2], 0.086f); // Venus
+  scaleGeom(ctx->geom[3], 0.091f); // Earth
+  scaleGeom(ctx->geom[4], 0.048f); // Mars
+  scaleGeom(ctx->geom[5], 1.027f); // Jupiter
+  scaleGeom(ctx->geom[6], 0.836f); // Saturn
+  scaleGeom(ctx->geom[7], 0.337f); // Uranus
+  scaleGeom(ctx->geom[8], 0.326f); // Neptune
+  scaleGeom(ctx->geom[9], 0.016f); // Pluto
 
-    // set orbitThetaPerSec
-    ctx->geom[0]->orbitThetaPerSec = 0.01f;
-    ctx->geom[1]->orbitThetaPerSec = 0.01f;
-    ctx->geom[2]->orbitThetaPerSec = 0.01f;
-    ctx->geom[3]->orbitThetaPerSec = 0.01f;
-    ctx->geom[4]->orbitThetaPerSec = 0.01f;
-    ctx->geom[5]->orbitThetaPerSec = 0.01f;
-    ctx->geom[6]->orbitThetaPerSec = 0.01f;
-    ctx->geom[7]->orbitThetaPerSec = 0.01f;
-    ctx->geom[8]->orbitThetaPerSec = 0.01f;
-    ctx->geom[9]->orbitThetaPerSec = 0.01f;
+  // set orientation, and lighting constants
+  for (gi=0; gi < geomNum; gi ++) {
+    SPOT_V4_SET(ctx->geom[gi]->quaternion, 1.0f, 0.0f, 0.0f, 0.0f);
+    rotate_model_ith(ctx->geom[gi], 0.75, 0);
+    ctx->geom[gi]->Kd = 0.4;
+    ctx->geom[gi]->Ks = 0.3;
+    ctx->geom[gi]->Ka = 0.3;
+  }
 
-    // scale the objects so that they resemble true dimensions
-    scaleGeom(ctx->geom[0], 2.000f); // Sun
-    scaleGeom(ctx->geom[1], 0.035f); // Mercury
-    scaleGeom(ctx->geom[2], 0.086f); // Venus
-    scaleGeom(ctx->geom[3], 0.091f); // Earth
-    scaleGeom(ctx->geom[4], 0.048f); // Mars
-    scaleGeom(ctx->geom[5], 1.027f); // Jupiter
-    scaleGeom(ctx->geom[6], 0.836f); // Saturn
-    scaleGeom(ctx->geom[7], 0.337f); // Uranus
-    scaleGeom(ctx->geom[8], 0.326f); // Neptune
-    scaleGeom(ctx->geom[9], 0.016f); // Pluto
-
-    // set orientation
-    for (gi=0; gi < geomNum; gi ++) {
-      SPOT_V4_SET(ctx->geom[gi]->quaternion, 1.0f, 0.0f, 0.0f, 0.0f);
-      rotate_model_ith(ctx->geom[gi], 0.75, 0);
-      ctx->geom[gi]->Kd = 0.4;
-      ctx->geom[gi]->Ks = 0.3;
-      ctx->geom[gi]->Ka = 0.3;
-    }
-
-    // load images
-    spotImageLoadPNG(ctx->image[0], "textimg/sun.png");     // Sun
-    spotImageLoadPNG(ctx->image[1], "textimg/mercury.png"); // Mercury 
-    spotImageLoadPNG(ctx->image[2], "textimg/venus.png");   // Venus
-    spotImageLoadPNG(ctx->image[3], "textimg/earth.png");   // Earth
-    spotImageLoadPNG(ctx->image[4], "textimg/mars.png");    // Mars
-    spotImageLoadPNG(ctx->image[5], "textimg/jupiter.png"); // Jupiter
-    spotImageLoadPNG(ctx->image[6], "textimg/saturn.png");  // Saturn
-    spotImageLoadPNG(ctx->image[7], "textimg/uranus.png");  // Uranus
-    spotImageLoadPNG(ctx->image[8], "textimg/neptune.png"); // Neptune
-    spotImageLoadPNG(ctx->image[9], "textimg/pluto.png");   // Pluto
+  // load images
+  spotImageLoadPNG(ctx->image[0], "textimg/sun.png");     // Sun
+  spotImageLoadPNG(ctx->image[1], "textimg/mercury.png"); // Mercury 
+  spotImageLoadPNG(ctx->image[2], "textimg/venus.png");   // Venus
+  spotImageLoadPNG(ctx->image[3], "textimg/earth.png");   // Earth
+  spotImageLoadPNG(ctx->image[4], "textimg/mars.png");    // Mars
+  spotImageLoadPNG(ctx->image[5], "textimg/jupiter.png"); // Jupiter
+  spotImageLoadPNG(ctx->image[6], "textimg/saturn.png");  // Saturn
+  spotImageLoadPNG(ctx->image[7], "textimg/uranus.png");  // Uranus
+  spotImageLoadPNG(ctx->image[8], "textimg/neptune.png"); // Neptune
+  spotImageLoadPNG(ctx->image[9], "textimg/pluto.png");   // Pluto
 
   ctx->ticDraw = -1;
   ctx->ticMouse = -1;
@@ -300,8 +234,6 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   ctx->thetaPerSecV = 0;
   ctx->thetaPerSecN = 0;
   ctx->onlyN = 0;
-
-//	ctx->cubeMapId = 2;
 
   ctx->angleU = 0;
   ctx->angleV = 0;
@@ -348,7 +280,6 @@ void setUnilocs() {
       SET_UNILOC(sampler7);
       SET_UNILOC(sampler8);
       SET_UNILOC(sampler9);
-//      SET_UNILOC(cubeMap);
       SET_UNILOC(Zu);
       SET_UNILOC(Zv);
       SET_UNILOC(Zspread);
@@ -475,7 +406,6 @@ int contextGLInit(context_t *ctx) {
   gctx->paused = 0;
   gctx->minFilter = GL_NEAREST;
   gctx->magFilter = GL_NEAREST;
-  gctx->perVertexTexturingMode=0; 
   gctx->time = 0.0f;
 //  perVertexTexturing();
 
@@ -501,44 +431,11 @@ int contextGLInit(context_t *ctx) {
   gctx->camera.at[0] = 0;
   gctx->camera.at[1] = 0;
   gctx->camera.at[2] = 0;
-/*
-  // NOTE: spotlight initializations
-  SPOT_M4_IDENTITY(gctx->spotlight.uvn);
-  SPOT_M4_IDENTITY(gctx->spotlight.inverse_uvn);
-  SPOT_M4_IDENTITY(gctx->spotlight.proj);
-  // fov == umbra angle
-  gctx->spotlight.fov = 1.57079633/10; // 90 degrees
-  gctx->spotlight.up[0] = 0;
-  gctx->spotlight.up[1] = 1;
-  gctx->spotlight.up[2] = 0;
-  SPOT_V3_SET(gctx->spotlight.from, 0.0f, 0.0f, -5.0f);
-  // Always 0,0,0
-  gctx->spotlight.at[0] = 0;
-  gctx->spotlight.at[1] = 0;
-  gctx->spotlight.at[2] = 0;
-  gctx->spotlight.from[0] = 0;
-  gctx->spotlight.from[0] = 0;
-  gctx->spotlight.from[0] = -1;
-  gctx->spotlight.fixed = 0; // CHECK
-*/
-  fprintf(stderr, "sucessfully initialized camera & spotlight\n");
 
   // NOTE: Mouse function intializations
   gctx->mouseFun.m = NULL;
   gctx->mouseFun.f = identity;
   gctx->mouseFun.offset=gctx->mouseFun.multiplier=gctx->mouseFun.i = 0;
-
-	/*
-  glActiveTexture(GL_TEXTURE3);
-  glBindTexture(GL_TEXTURE_2D, ctx->image[3]->textureId);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gctx->minFilter);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gctx->magFilter);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ctx->image[3]->sizeX, ctx->image[3]->sizeY, 0,
-      GL_RGB, GL_UNSIGNED_BYTE, ctx->image[3]->data.v);
-  glGenerateMipmap(GL_TEXTURE_2D);
-  glUniform1i(ctx->uniloc.samplerD, 3);*/
 
   return 0;
 }
@@ -592,31 +489,26 @@ int contextDraw(context_t *ctx) {
   const char me[]="contextDraw";
   unsigned int gi;
   GLfloat modelMat[16];
-  GLfloat thetaPerSecU, thetaPerSecV, thetaPerSecN;
-
+/*
   if (ctx->buttonDown) {
-    /* When the mouse is down, use a velocity of zero */
+    // When the mouse is down, use a velocity of zero 
     thetaPerSecU = 0;
     thetaPerSecV = 0;
     thetaPerSecN = 0;
   } else {
-    /* Otherwise, use the previous velocity */
+    // Otherwise, use the previous velocity 
     thetaPerSecU = ctx->thetaPerSecU;
     thetaPerSecV = ctx->thetaPerSecV;
     thetaPerSecN = ctx->thetaPerSecN;
   }
 
-  double toc = spotTime();
-  if (ctx->ticDraw == -1)
-    ctx->ticDraw = toc;
-  double dt = toc - ctx->ticDraw;
-  ctx->ticDraw = toc;
 
   gctx->angleU = (thetaPerSecU * dt) * 0.1;
   gctx->angleV = (thetaPerSecV * dt) * 0.1;
   gctx->angleN = (thetaPerSecN * dt) * 0.1;
   rotate_model_UV(gctx->angleU, -gctx->angleV);
   rotate_model_N(-gctx->angleN);
+*/
 
   /* re-assert which program is being used (AntTweakBar uses its own) */
   glUseProgram(ctx->program); 
@@ -638,10 +530,6 @@ int contextDraw(context_t *ctx) {
      be sampled by which sampler.  See OpenGL SuperBible (5th edition)
      pg 279.  Also, http://tinyurl.com/7bvnej3 is amusing and
      informative */
-
-//  glActiveTexture(GL_TEXTURE0);
-//  glBindTexture(GL_TEXTURE_CUBE_MAP, ctx->image[4+ctx->cubeMapId]->textureId);
-//  glUniform1i(ctx->uniloc.cubeMap, 0);
 
   // Sun
   glActiveTexture(GL_TEXTURE0);
@@ -705,17 +593,18 @@ int contextDraw(context_t *ctx) {
   glUniform3fv(ctx->uniloc.lightColor, 1, ctx->lightColor);
   glUniform1i(ctx->uniloc.seamFix, ctx->seamFix);
 
+  // set time
+  double toc = spotTime();
+  if (ctx->ticDraw == -1)
+    ctx->ticDraw = toc;
+  double dt = toc - ctx->ticDraw;
+  ctx->ticDraw = toc;
+
+  if (!gctx->paused) {
+    updateScene(gctx->time, dt);
+  }
+
   for (gi=0; gi<ctx->geomNum; gi++) {
-    if (!gctx->paused) {
-      // have each planet rotate accordingly
-      rotate_model_ith(ctx->geom[gi], ctx->geom[gi]->axialThetaPerSec, 1); 
-
-      // have each planet orbit accordingly
-      if (gi != 0) {
-        orbit(ctx->geom[gi], ctx->geom[gi]->orbitAxis, ctx->geom[gi]->orbitThetaPerSec);
-      }
-    }
-
     set_model_transform(modelMat, ctx->geom[gi]);
     glUniformMatrix4fv(ctx->uniloc.modelMatrix, 
                        1, GL_FALSE, modelMat);
@@ -786,7 +675,7 @@ int contextDraw(context_t *ctx) {
   }
   return 0;
 }
-
+/*
 // NOTE: we use a callback here, since toggling perVertexTexturing requires the loading
 //       of different shaders (and thus updating unilocs)
 static void TW_CALL setPerVertexTexturingCallback(const void *value, void *clientData) {
@@ -801,7 +690,6 @@ static void TW_CALL setPerVertexTexturingCallback(const void *value, void *clien
   }
   setUnilocs();
 }
-
 static void TW_CALL getPerVertexTexturingCallback(void *value, void *clientData) {
   *((int *) value) = gctx->perVertexTexturingMode;
 }
@@ -831,6 +719,7 @@ static void TW_CALL getBumpMappingCallback(void *value, void *clientData) {
   *((int *) value) = gctx->bumpMappingMode;
 }
 
+*/
 /*static void TW_CALL setCubeMapCallback(const void *value, void *clientData) {
 	enum CubeMaps cubemap = *((const enum CubeMaps *) value);
 	switch (cubemap) {
@@ -848,7 +737,7 @@ static void TW_CALL getBumpMappingCallback(void *value, void *clientData) {
 
 static void TW_CALL getCubeMapCallback(void *value, void *clientData) {
   *((int *) value) = gctx->cubeMapId;
-} */
+} 
 static void TW_CALL setShaderCallback(const void *value, void *clientData) {
 	enum Shaders shader = *((const enum Shaders *) value);
 	switch (shader) {
@@ -878,7 +767,7 @@ static void TW_CALL getShaderCallback(void *value, void *clientData) {
 	}
   *((int *) value) = shader;
 }
-
+*/
 static void TW_CALL setObjectCallback(const void *value, void *clientData) {
 	enum Objects object = *((const enum Objects *) value);
 	switch (object) {
@@ -919,7 +808,7 @@ static void TW_CALL getObjectCallback(void *value, void *clientData) {
   *((int *) value) = gctx->gi;
 }
 
-
+/*
 static void TW_CALL setFilteringCallback(const void *value, void *clientData) {
   gctx->filteringMode = *((const enum FilteringModes *) value);
   switch (gctx->filteringMode) {
@@ -952,7 +841,7 @@ static void TW_CALL setFilteringCallback(const void *value, void *clientData) {
 static void TW_CALL getFilteringCallback(void *value, void *clientData) {
   *((int *) value) = gctx->filteringMode;
 }
-
+*/
 // NOTE: here are our tweak bar definitions
 int updateTweakBarVars(int scene) {
   int EE=0;
@@ -984,6 +873,7 @@ int updateTweakBarVars(int scene) {
   if (!EE) EE |= !TwAddVarRW(gctx->tbar, "bgColor",
                              TW_TYPE_COLOR3F, &(gctx->bgColor),
                              " label='bkgr color' ");
+/*
   switch (scene) {
     case 1:
       if (!EE) EE |= !TwAddVarRW(
@@ -1019,6 +909,7 @@ int updateTweakBarVars(int scene) {
     default:
       break;
   }
+*/
   return EE;
 }
 
