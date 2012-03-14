@@ -522,25 +522,16 @@ void scaleGeomZ(spotGeom *g, GLfloat s)
 /* Orbitting */
 void orbit(spotGeom *obj, GLfloat axis[3], GLfloat theta)
 {
-  GLfloat co, si, r, temp, zero[4], pos[4], x[3], y[3];
+  GLfloat co, si, r[4*4], t[4*4];
 
-  r = obj->radius;
-  zero[0] = zero[1] = zero[2] = 0;
-  zero[3] = 1;
   co = cosf(theta); si = sinf(theta);
 
-  // get position of the object
-  SPOT_M4V4_MUL(pos, obj->modelMatrix, zero);
+  // set r, the rotation transformation around axis a
+  SPOT_M4_ROTATE_AROUND(r, axis, co, si);
 
-  // set x and y 
-  SPOT_V3_NORM(x, pos, temp);
-  SPOT_V3_CROSS(y, x, axis);
-  SPOT_V3_NORM(y, y, temp);
-  SPOT_V3_SCALE(y, r * si, y);
-  SPOT_V3_SCALE(x, (r - (r*co)), x);
+  SPOT_M4_MUL(t, r, obj->modelMatrix);
+  SPOT_M4_SET_2(obj->modelMatrix, t);
 
-  translate(obj->modelMatrix, x);
-  translate(obj->modelMatrix, y); 
 }
 
 
@@ -671,10 +662,10 @@ void updateScene(GLfloat time, GLfloat dt)
 
   // update each planet
   for (gi = 0; gi < gctx->geomNum; gi++) {
-    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->axialThetaPerSec * dt / 20, 1);
+    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->rotationPeriod * dt, 1);
 
     if (gi != 0) {
-      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, (1/gctx->geom[gi]->orbitThetaPerSec) * dt * 10);
+      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, (1/gctx->geom[gi]->orbitalPeriod) * dt);
     }
   }
 
