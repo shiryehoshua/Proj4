@@ -429,9 +429,9 @@ int contextGLInit(context_t *ctx) {
   gctx->camera.up[0] = 0;
   gctx->camera.up[1] = 1;
   gctx->camera.up[2] = 0;
-  gctx->camera.from[0] = -1;
-  gctx->camera.from[1] = -50;
-  gctx->camera.from[2] = 0;
+  gctx->camera.from[0] = 0;
+  gctx->camera.from[1] = -2;
+  gctx->camera.from[2] = 25;
   gctx->camera.at[0] = 0;
   gctx->camera.at[1] = 0;
   gctx->camera.at[2] = 0;

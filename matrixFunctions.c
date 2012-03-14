@@ -677,7 +677,7 @@ void updateScene(GLfloat time, GLfloat dt)
 		gctx->time = time;
 	}
 
-	GLfloat d=100.0; // dist
+	GLfloat d=25.0; // dist
 	GLfloat r=2.0 * M_PI;
 	// SPLINE from keyframe 0 => 2
 	if (floor(time)>=0 && ceil(time)<=2) {
@@ -700,7 +700,7 @@ void updateScene(GLfloat time, GLfloat dt)
 	// SPLINE from keyframe 3 => 4
 	if (floor(time)>=3 && ceil(time)<=4) {
 		GLfloat t = dt;
-		t *= 2.0 * d; // 2x dist. w/ 1x time
+		t *= 1.0 * d; // 2x dist. w/ 1x time
 		translate_view_N(gctx->camera.uvn, &t, 0);
 	}
 	// LINEAR RAMP from keyfram 4 => 5
