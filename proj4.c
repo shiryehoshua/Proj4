@@ -315,22 +315,26 @@ int contextGLInit(context_t *ctx) {
   fragFnames[ID_PARALLAX]="parallax.frag";
   vertFnames[ID_SPOTLIGHT]="spotlight.vert";
   fragFnames[ID_SPOTLIGHT]="spotlight.frag";
+	vertFnames[ID_PLANETS]="planets.vert";
+	fragFnames[ID_PLANETS]="planets.frag";
 
   // NOTE: we loop for as many shaders as are in our "stack" (NUM_PROGRAMS), and then once more
   //       to pull in whatever shader was passed in via the terminal (or not, if we have
   //       ctx->vertName==NULL)
   const char *vertFname, *fragFname;
   for (i=0; i<=NUM_PROGRAMS-(ctx->vertFname==NULL?1:0); i++) {
+		vertFname="planets.vert";
+		fragFname="planets.frag";
     // NOTE: consider this the "invoked" or default shader paseed via the terminal; it will be
     //       loaded last, and thus the first shader visible
-    if (i==NUM_PROGRAMS) {
+    /*if (i==NUM_PROGRAMS) {
       vertFname=ctx->vertFname;
       fragFname=ctx->fragFname;
     // otherwise, we want to load our "stack" of shaders
     } else {
       vertFname = vertFnames[i];
       fragFname = fragFnames[i];
-    }
+    }*/
     // NOTE: use `spotProgramNew' to handle all the `glLinkProgram' specifics; we also specify the
     //       per-vertex attributes we need
     ctx->program = spotProgramNew(vertFname, fragFname,
@@ -356,9 +360,9 @@ int contextGLInit(context_t *ctx) {
 
   // NOTE: the following is equivalent to hitting '1' on the keyboard; i.e. default
   //       scene
-  if (ctx->vertFname==NULL) {
-    gctx->program=programIds[ID_TEXTURE];
-  }
+  //if (ctx->vertFname==NULL) {
+  //  gctx->program=programIds[ID_TEXTURE];
+  //}
 
   // NOTE: this sets the uniform locations for the _invoked_ shader
   setUnilocs();
