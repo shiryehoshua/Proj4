@@ -429,8 +429,8 @@ int contextGLInit(context_t *ctx) {
   gctx->camera.up[0] = 0;
   gctx->camera.up[1] = 1;
   gctx->camera.up[2] = 0;
-  gctx->camera.from[0] = 0;
-  gctx->camera.from[1] = -2;
+  gctx->camera.from[0] = -25;
+  gctx->camera.from[1] = 0;
   gctx->camera.from[2] = 25;
   gctx->camera.at[0] = 0;
   gctx->camera.at[1] = 0;
@@ -593,7 +593,7 @@ int contextDraw(context_t *ctx) {
   ctx->ticDraw = toc;
 
   if (!gctx->paused) {
-    updateScene(gctx->time, dt);
+    updateScene(gctx->time, dt*0.1);
   }
 
   // NOTE: we must normalize our UVN matrix

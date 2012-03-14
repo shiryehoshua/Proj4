@@ -659,13 +659,16 @@ void updateNormals(GLfloat n[4*4], GLfloat m[3*3])
 void updateScene(GLfloat time, GLfloat dt)
 {
   int gi;
+	GLfloat d=50.0; // dist
+	GLfloat r=(2.0 * M_PI);
+	GLfloat t;
 
   // update each planet
   for (gi = 0; gi < gctx->geomNum; gi++) {
-    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->rotationPeriod * dt, 1);
+    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->rotationPeriod * (dt/1), 1);
 
     if (gi != 0) {
-      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, (1/gctx->geom[gi]->orbitalPeriod) * dt);
+      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, (1/gctx->geom[gi]->orbitalPeriod) * (dt/1));
     }
   }
 
@@ -673,41 +676,21 @@ void updateScene(GLfloat time, GLfloat dt)
 	GLfloat rem = 0;
   if (time >= 5.0) {
 		gctx->time = rem = time - 5.0f;
+		printf("Rem: %f\n", rem);
 	} else {
 		gctx->time = time;
 	}
 
-	GLfloat d=25.0; // dist
-	GLfloat r=2.0 * M_PI;
 	// SPLINE from keyframe 0 => 2
-	if (floor(time)>=0 && ceil(time)<=2) {
-		GLfloat t = dt;
-		t *= -0.5 * d; // 1x dist. w/ 2x time
-		translate_view_N(gctx->camera.uvn, &t, 0);
+		t = dt * r; // 1x dist. w/ 2x time
+	if (round(time)>=0 && ceil(time)<=2.5) {
+		rotate_view_N(2*t);
 	}
-	// LINEAR RAMP from keyframe 1 => 2
-//	if (floor(time)>=1 && ceil(time)<=2) {
-//		GLfloat t = dt;
-//		t *= 0.5 * r; // 1x rot. w/ 2x time
-//		rotate_view_U(t);
-//	}
-	// LINEAR RAMP from keyframe 2 => 3
-	if (floor(time)>=2 && ceil(time)<=3) {
-		GLfloat t = dt;
-		t *= 0.5 * r; // 1x rot. w/ 2x time
-		rotate_view_V(t); // 360*
+	if (round(time)>=1.25 && ceil(time)<=3.75) {
+		rotate_view_V(2*t);
 	}
-	// SPLINE from keyframe 3 => 4
-	if (floor(time)>=3 && ceil(time)<=4) {
-		GLfloat t = dt;
-		t *= 1.0 * d; // 2x dist. w/ 1x time
-		translate_view_N(gctx->camera.uvn, &t, 0);
-	}
-	// LINEAR RAMP from keyfram 4 => 5
-	if (floor(time)>=4 && ceil(time)<=5) {
-		GLfloat t = dt;
-		t *= -1.0 * d; // 1x dist. w/ 1x time
-		translate_view_N(gctx->camera.uvn, &t, 0);
+	if (round(time)>=2.5 && ceil(time)<=5) {
+		rotate_view_U(2*t);
 	}
 
 	//printf("Time: %f\n", gctx->time);
