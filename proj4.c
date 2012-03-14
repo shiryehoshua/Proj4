@@ -171,29 +171,29 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     translateGeomU(ctx->geom[gi], ctx->geom[gi]->radius);
   }
 
-  // set axialThetaPerSec
-  ctx->geom[0]->axialThetaPerSec =  25.38f; // Sun
-  ctx->geom[1]->axialThetaPerSec =  58.64f; // Mercury
-  ctx->geom[2]->axialThetaPerSec = -243.0f; // Venus 
-  ctx->geom[3]->axialThetaPerSec =  0.997f; // Earth 
-  ctx->geom[4]->axialThetaPerSec =  1.025f; // Mars 
-  ctx->geom[5]->axialThetaPerSec =  0.413f; // Jupiter
-  ctx->geom[6]->axialThetaPerSec =  0.444f; // Saturn 
-  ctx->geom[7]->axialThetaPerSec = -0.718f; // Uranus 
-  ctx->geom[8]->axialThetaPerSec =  0.671f; // Neptune
-  ctx->geom[9]->axialThetaPerSec = -6.387f; // Pluto 
+  // set rotation periods
+  ctx->geom[0]->rotationPeriod =  25.38f; // Sun
+  ctx->geom[1]->rotationPeriod =  58.64f; // Mercury
+  ctx->geom[2]->rotationPeriod = -243.0f; // Venus 
+  ctx->geom[3]->rotationPeriod =  0.997f; // Earth 
+  ctx->geom[4]->rotationPeriod =  1.025f; // Mars 
+  ctx->geom[5]->rotationPeriod =  0.413f; // Jupiter
+  ctx->geom[6]->rotationPeriod =  0.444f; // Saturn 
+  ctx->geom[7]->rotationPeriod = -0.718f; // Uranus 
+  ctx->geom[8]->rotationPeriod =  0.671f; // Neptune
+  ctx->geom[9]->rotationPeriod = -6.387f; // Pluto 
 
-  // set orbitThetaPerSec
-  ctx->geom[0]->orbitThetaPerSec = 0.000f; // Sun
-  ctx->geom[1]->orbitThetaPerSec = 0.241f; // Mercury
-  ctx->geom[2]->orbitThetaPerSec = 0.615f; // Venus
-  ctx->geom[3]->orbitThetaPerSec = 1.000f; // Earth
-  ctx->geom[4]->orbitThetaPerSec = 1.881f; // 
-  ctx->geom[5]->orbitThetaPerSec = 11.86f; //
-  ctx->geom[6]->orbitThetaPerSec = 29.45f;
-  ctx->geom[7]->orbitThetaPerSec = 84.01f;
-  ctx->geom[8]->orbitThetaPerSec = 164.7f;
-  ctx->geom[9]->orbitThetaPerSec = 247.9f;
+  // set orbital period
+  ctx->geom[0]->orbitalPeriod = 0.000f; // Sun
+  ctx->geom[1]->orbitalPeriod = 0.241f; // Mercury
+  ctx->geom[2]->orbitalPeriod = 0.615f; // Venus
+  ctx->geom[3]->orbitalPeriod = 1.000f; // Earth
+  ctx->geom[4]->orbitalPeriod = 1.881f; // 
+  ctx->geom[5]->orbitalPeriod = 11.86f; //
+  ctx->geom[6]->orbitalPeriod = 29.45f;
+  ctx->geom[7]->orbitalPeriod = 84.01f;
+  ctx->geom[8]->orbitalPeriod = 164.7f;
+  ctx->geom[9]->orbitalPeriod = 247.9f;
 
   // scale the objects so that they resemble true dimensions
   scaleGeom(ctx->geom[0], 2.000f); // Sun
@@ -425,9 +425,9 @@ int contextGLInit(context_t *ctx) {
   gctx->camera.up[0] = 0;
   gctx->camera.up[1] = 1;
   gctx->camera.up[2] = 0;
-  gctx->camera.from[0] = 0;
-  gctx->camera.from[1] = -2.0f;
-  gctx->camera.from[2] = 25.0f;
+  gctx->camera.from[0] = -1;
+  gctx->camera.from[1] = -50;
+  gctx->camera.from[2] = 0;
   gctx->camera.at[0] = 0;
   gctx->camera.at[1] = 0;
   gctx->camera.at[2] = 0;
