@@ -581,6 +581,9 @@ int contextDraw(context_t *ctx) {
   glBindTexture(GL_TEXTURE_2D, ctx->image[9]->textureId);
   glUniform1i(ctx->uniloc.sampler9, 9); 
 
+	if (!gctx->paused) {
+	}
+
   // NOTE: we must normalize our UVN matrix
   norm_M4(gctx->camera.uvn);
 	inverseUVN(gctx->camera.inverse_uvn, gctx->camera.uvn);
