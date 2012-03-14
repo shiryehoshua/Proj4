@@ -581,10 +581,16 @@ int contextDraw(context_t *ctx) {
   glBindTexture(GL_TEXTURE_2D, ctx->image[9]->textureId);
   glUniform1i(ctx->uniloc.sampler9, 9); 
 
-	if (!gctx->paused) {
-		GLfloat s = 1;
-		translate_view_N(gctx->camera.uvn, &s, 0);
-	}
+  // set time
+  double toc = spotTime();
+  if (ctx->ticDraw == -1)
+    ctx->ticDraw = toc;
+  double dt = toc - ctx->ticDraw;
+  ctx->ticDraw = toc;
+
+  if (!gctx->paused) {
+    updateScene(gctx->time, dt);
+  }
 
   // NOTE: we must normalize our UVN matrix
   norm_M4(gctx->camera.uvn);
@@ -597,17 +603,6 @@ int contextDraw(context_t *ctx) {
   glUniform3fv(ctx->uniloc.lightDir, 1, ctx->lightDir);
   glUniform3fv(ctx->uniloc.lightColor, 1, ctx->lightColor);
   glUniform1i(ctx->uniloc.seamFix, ctx->seamFix);
-
-  // set time
-  double toc = spotTime();
-  if (ctx->ticDraw == -1)
-    ctx->ticDraw = toc;
-  double dt = toc - ctx->ticDraw;
-  ctx->ticDraw = toc;
-
-  if (!gctx->paused) {
-    updateScene(gctx->time, dt);
-  }
 
   for (gi=0; gi<ctx->geomNum; gi++) {
     set_model_transform(modelMat, ctx->geom[gi]);
