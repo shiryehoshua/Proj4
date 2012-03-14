@@ -672,7 +672,30 @@ void updateScene(GLfloat time, GLfloat dt)
   gctx->time += dt;
   if (gctx->time >= 5.0) { gctx->time = 0.0f; }
 
-  fprintf(stderr, "time: %f\n", gctx->time);
+	GLfloat s=-1.25;
+	GLfloat r=2 * M_PI;
+	// SPLINE from keyframe 0 => 2
+	if (floor(time)>=0 && ceil(time)<=2) {
+		GLfloat t=0.5*s;
+		translate_view_N(gctx->camera.uvn, &t, 0); // 1x dist. w/ 2x time
+	}
+	// LINEAR RAMP from keyframe 1 => 2
+	if (floor(time)>=1 && ceil(time)<=2) {
+		rotate_view_U(r); // 360*
+	}
+	// LINEAR RAMP from keyframe 2 => 4
+	if (floor(time)>=2 && ceil(time)<=4) {
+		rotate_view_V(r); // 360*
+	}
+	// SPLINE from keyframe 3 => 4
+	if (floor(time)>=3 && ceil(time)<=4) {
+		GLfloat t=(-2) * s;
+		translate_view_N(gctx->camera.uvn, &t, 0); // 2x dist. w/ 1x time
+	}
+	// LINEAR RAMP from keyfram 4 => 5
+	if (floor(time)>=4 && ceil(time)<=5) {
+		translate_view_N(gctx->camera.uvn, &s, 0); // 1x dist. w/ 1x time
+	}
 }
 
 /* Normalize homogenous coordinates */
