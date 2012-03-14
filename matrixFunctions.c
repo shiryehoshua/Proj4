@@ -671,10 +671,10 @@ void updateScene(GLfloat time, GLfloat dt)
 
   // update each planet
   for (gi = 0; gi < gctx->geomNum; gi++) {
-    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->axialThetaPerSec * dt, 1);
+    rotate_model_ith(gctx->geom[gi], gctx->geom[gi]->axialThetaPerSec * dt / 20, 1);
 
     if (gi != 0) {
-      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, gctx->geom[gi]->orbitThetaPerSec * dt);
+      orbit(gctx->geom[gi], gctx->geom[gi]->orbitAxis, (1/gctx->geom[gi]->orbitThetaPerSec) * dt * 10);
     }
   }
 

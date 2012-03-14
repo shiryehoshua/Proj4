@@ -156,44 +156,44 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
   ctx->geom[9]->radius = 18.34f;
 
   // set object orbit axis
-  SPOT_V3_SET(ctx->geom[0]->orbitAxis, 0.0f, 0.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[1]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[2]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[3]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[4]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[5]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[6]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[7]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[8]->orbitAxis, 0.0f, 1.0f, 0.0f); 
-  SPOT_V3_SET(ctx->geom[9]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+  SPOT_V3_SET(ctx->geom[0]->orbitAxis, 0.0f, 0.0f, 0.0f); // Sun 
+  SPOT_V3_SET(ctx->geom[1]->orbitAxis, 0.0f, 1.0f, 0.0f); // Mercury
+  SPOT_V3_SET(ctx->geom[2]->orbitAxis, 0.0f, 1.0f, 0.0f); // Venus
+  SPOT_V3_SET(ctx->geom[3]->orbitAxis, 0.0f, 1.0f, 0.0f); // Earth
+  SPOT_V3_SET(ctx->geom[4]->orbitAxis, 0.0f, 1.0f, 0.0f); // Mars
+  SPOT_V3_SET(ctx->geom[5]->orbitAxis, 0.0f, 1.0f, 0.0f); // Jupiter
+  SPOT_V3_SET(ctx->geom[6]->orbitAxis, 0.0f, 1.0f, 0.0f); // Saturn
+  SPOT_V3_SET(ctx->geom[7]->orbitAxis, 0.0f, 1.0f, 0.0f); // Uranus
+  SPOT_V3_SET(ctx->geom[8]->orbitAxis, 0.0f, 1.0f, 0.0f); // Neptune
+  SPOT_V3_SET(ctx->geom[9]->orbitAxis, 0.0f, 1.0f, 0.0f); // Pluto
 
   for (gi=0; gi < geomNum; gi ++) {
     translateGeomU(ctx->geom[gi], ctx->geom[gi]->radius);
   }
 
   // set axialThetaPerSec
-  ctx->geom[0]->axialThetaPerSec = 0.01f;
-  ctx->geom[1]->axialThetaPerSec = 0.01f; 
-  ctx->geom[2]->axialThetaPerSec = 0.01f; 
-  ctx->geom[3]->axialThetaPerSec = 0.01f; 
-  ctx->geom[4]->axialThetaPerSec = 0.01f; 
-  ctx->geom[5]->axialThetaPerSec = 0.01f; 
-  ctx->geom[6]->axialThetaPerSec = 0.01f; 
-  ctx->geom[7]->axialThetaPerSec = 0.01f; 
-  ctx->geom[8]->axialThetaPerSec = 0.01f; 
-  ctx->geom[9]->axialThetaPerSec = 0.01f; 
+  ctx->geom[0]->axialThetaPerSec =  25.38f; // Sun
+  ctx->geom[1]->axialThetaPerSec =  58.64f; // Mercury
+  ctx->geom[2]->axialThetaPerSec = -243.0f; // Venus 
+  ctx->geom[3]->axialThetaPerSec =  0.997f; // Earth 
+  ctx->geom[4]->axialThetaPerSec =  1.025f; // Mars 
+  ctx->geom[5]->axialThetaPerSec =  0.413f; // Jupiter
+  ctx->geom[6]->axialThetaPerSec =  0.444f; // Saturn 
+  ctx->geom[7]->axialThetaPerSec = -0.718f; // Uranus 
+  ctx->geom[8]->axialThetaPerSec =  0.671f; // Neptune
+  ctx->geom[9]->axialThetaPerSec = -6.387f; // Pluto 
 
   // set orbitThetaPerSec
-  ctx->geom[0]->orbitThetaPerSec = 0.01f;
-  ctx->geom[1]->orbitThetaPerSec = 0.01f;
-  ctx->geom[2]->orbitThetaPerSec = 0.01f;
-  ctx->geom[3]->orbitThetaPerSec = 0.01f;
-  ctx->geom[4]->orbitThetaPerSec = 0.01f;
-  ctx->geom[5]->orbitThetaPerSec = 0.01f;
-  ctx->geom[6]->orbitThetaPerSec = 0.01f;
-  ctx->geom[7]->orbitThetaPerSec = 0.01f;
-  ctx->geom[8]->orbitThetaPerSec = 0.01f;
-  ctx->geom[9]->orbitThetaPerSec = 0.01f;
+  ctx->geom[0]->orbitThetaPerSec = 0.000f; // Sun
+  ctx->geom[1]->orbitThetaPerSec = 0.241f; // Mercury
+  ctx->geom[2]->orbitThetaPerSec = 0.615f; // Venus
+  ctx->geom[3]->orbitThetaPerSec = 1.000f; // Earth
+  ctx->geom[4]->orbitThetaPerSec = 1.881f; // 
+  ctx->geom[5]->orbitThetaPerSec = 11.86f; //
+  ctx->geom[6]->orbitThetaPerSec = 29.45f;
+  ctx->geom[7]->orbitThetaPerSec = 84.01f;
+  ctx->geom[8]->orbitThetaPerSec = 164.7f;
+  ctx->geom[9]->orbitThetaPerSec = 247.9f;
 
   // scale the objects so that they resemble true dimensions
   scaleGeom(ctx->geom[0], 2.000f); // Sun
