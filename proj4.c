@@ -222,7 +222,7 @@ context_t *contextNew(unsigned int geomNum, unsigned int imageNum) {
     ctx->geom[9]->radius = 18.34f;
 
     // set object orbit axis
-    SPOT_V3_SET(ctx->geom[0]->orbitAxis, 0.0f, 1.0f, 0.0f); 
+    SPOT_V3_SET(ctx->geom[0]->orbitAxis, 0.0f, 0.0f, 0.0f); 
     SPOT_V3_SET(ctx->geom[1]->orbitAxis, 0.0f, 1.0f, 0.0f); 
     SPOT_V3_SET(ctx->geom[2]->orbitAxis, 0.0f, 1.0f, 0.0f); 
     SPOT_V3_SET(ctx->geom[3]->orbitAxis, 0.0f, 1.0f, 0.0f); 
@@ -707,7 +707,9 @@ int contextDraw(context_t *ctx) {
     rotate_model_ith(ctx->geom[gi], ctx->geom[gi]->axialThetaPerSec, 1); 
 
     // have each planet orbit accordingly
-    orbit(ctx->geom[gi], ctx->geom[gi]->orbitAxis, ctx->geom[gi]->orbitThetaPerSec);
+    if (gi != 0) {
+      orbit(ctx->geom[gi], ctx->geom[gi]->orbitAxis, ctx->geom[gi]->orbitThetaPerSec);
+    }
 
     set_model_transform(modelMat, ctx->geom[gi]);
     glUniformMatrix4fv(ctx->uniloc.modelMatrix, 

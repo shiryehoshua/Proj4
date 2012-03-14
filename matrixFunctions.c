@@ -525,16 +525,23 @@ void orbit(spotGeom *obj, GLfloat axis[3], GLfloat theta)
   GLfloat co, si, r, temp, zero[4], pos[4], x[3], y[3];
 
   r = obj->radius;
-  zero[0] = zero[1] = zero[2] = zero[3] = 0;
+  zero[0] = zero[1] = zero[2] = 0;
+  zero[3] = 1;
   co = cosf(theta); si = sinf(theta);
 
   // get position of the object
   SPOT_M4V4_MUL(pos, obj->modelMatrix, zero);
 
   // set x and y 
-  SPOT_V3_NORM(y, axis, temp); 
+  SPOT_V3_NORM(x, pos, temp);
+  SPOT_V3_CROSS(y, x, axis);
+  SPOT_V3_NORM(y, y, temp);
   SPOT_V3_SCALE(y, r * si, y);
-  SPOT_V3_COPY(x, y);
+  SPOT_V3_SCALE(x, (r - r*co), x);
+
+  fprintf(stderr, "x: %f, %f, %f\n y: %f, %f, %f\n", x[0], x[1], x[2], y[0], y[1], y[2]);
+  fprintf(stderr, "pos: %f, %f, %f\n", pos[0], pos[1], pos[2]);
+  printM4(obj->modelMatrix);
 
   translate(obj->modelMatrix, x);
   translate(obj->modelMatrix, y); 
