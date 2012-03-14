@@ -659,9 +659,9 @@ void updateNormals(GLfloat n[4*4], GLfloat m[3*3])
 void updateScene(GLfloat time, GLfloat dt)
 {
   int gi;
-	GLfloat d=50.0; // dist
-	GLfloat r=(2.0 * M_PI);
-	GLfloat t;
+  GLfloat d=50.0; // dist
+  GLfloat r=(2.0 * M_PI);
+  GLfloat t;
 
   // update each planet
   for (gi = 0; gi < gctx->geomNum; gi++) {
@@ -675,25 +675,33 @@ void updateScene(GLfloat time, GLfloat dt)
   time += dt;
 	GLfloat rem = 0;
   if (time >= 5.0) {
-		gctx->time = rem = time - 5.0f;
-		printf("Rem: %f\n", rem);
-	} else {
-		gctx->time = time;
-	}
+    gctx->time = rem = time - 5.0f;
+    printf("Rem: %f\n", rem);
+  } else {
+    gctx->time = time;
+  }
 
-	// SPLINE from keyframe 0 => 2
-		t = dt * r; // 1x dist. w/ 2x time
-	if (round(time)>=0 && ceil(time)<=2.5) {
-		rotate_view_N(2*t);
-	}
-	if (round(time)>=1.25 && ceil(time)<=3.75) {
-		rotate_view_V(2*t);
-	}
-	if (round(time)>=2.5 && ceil(time)<=5) {
-		rotate_view_U(2*t);
-	}
+  // SPLINE from keyframe 0 => 2
+    t = dt * r; // 1x dist. w/ 2x time
+  if (round(time)>=0 && ceil(time)<=2.5) {
+     rotate_view_N(2*t);
+  }
+  if (round(time)>=1.25 && ceil(time)<=3.75) {
+    rotate_view_V(2*t);
+  }
+  if (round(time)>=2.5 && ceil(time)<=5) {
+    rotate_view_U(2*t);
+  }
 
-	//printf("Time: %f\n", gctx->time);
+  // SPLINE to move camera position
+  P1[0] = P1[1] = P1[2] = 0; // Start at zero
+  P2[0] = 1.0; P2[1] = 0.0; P2[2] = 0.0; 
+  P3[0] = 5.0; P3[1] = -1.0; P3[2] = 0.0; 
+  P4[0] = 5.0; P4[1] = 5.0; P4[2] = 0.0; 
+  P5[0] = 5.0; P5[1] = 5.0; P5[2] = -1.0; 
+
+
+  //printf("Time: %f\n", gctx->time);
 
 }
 
