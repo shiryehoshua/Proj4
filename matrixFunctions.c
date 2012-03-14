@@ -1,4 +1,4 @@
-/*
+/**
  * matrixFunctions.c: general transformations, as well as code to update the projection and uvn
  *                    matrices.
  */
@@ -678,7 +678,7 @@ void updateScene(GLfloat time, GLfloat dt)
 	}
 
 	GLfloat d=100.0; // dist
-	GLfloat r=2.0 * M_PI; // rot
+	GLfloat r=2.0 * M_PI;
 	// SPLINE from keyframe 0 => 2
 	if (floor(time)>=0 && ceil(time)<=2) {
 		GLfloat t = dt;
@@ -689,13 +689,13 @@ void updateScene(GLfloat time, GLfloat dt)
 	if (floor(time)>=1 && ceil(time)<=2) {
 		GLfloat t = dt;
 		t *= 0.5 * r; // 1x rot. w/ 2x time
-//		rotate_view_U(t);
+		rotate_view_U(t);
 	}
 	// LINEAR RAMP from keyframe 2 => 4
 	if (floor(time)>=2 && ceil(time)<=4) {
 		GLfloat t = dt;
 		t *= 0.5 * r; // 1x rot. w/ 2x time
-//		rotate_view_V(t); // 360*
+		rotate_view_V(t); // 360*
 	}
 	// SPLINE from keyframe 3 => 4
 	if (floor(time)>=3 && ceil(time)<=4) {
@@ -743,6 +743,8 @@ void updateScene(GLfloat time, GLfloat dt)
 	}
 	}
 		
+	//printf("Time: %f\n", gctx->time);
+
 }
 
 /* Normalize homogenous coordinates */
