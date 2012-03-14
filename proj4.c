@@ -694,6 +694,8 @@ int contextDraw(context_t *ctx) {
   glUniform1i(ctx->uniloc.sampler9, 9); 
 
 	if (!gctx->paused) {
+		GLfloat s = 1;
+		translate_view_N(gctx->camera.uvn, &s, 0);
 	}
 
   // NOTE: we must normalize our UVN matrix
