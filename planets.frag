@@ -28,6 +28,7 @@ uniform float shexp;
 in vec4 fragColor;
 in vec3 texCoord;
 in vec3 vnrm;
+in vec3 sunLight;
 
 out vec4 color;
 
@@ -91,10 +92,10 @@ void main() {
   }
 
   // Phong Shading
-  vec3 diff = Kd * max(0.0, dot(vnrm, lightDir)) * c.rgb;
+  vec3 diff = Kd * max(0.0, dot(vnrm, sunLight)) * c.rgb;
   vec3 amb = Ka * c.rgb;
 
-  vec3 r = normalize(reflect(-normalize(lightDir), normalize(vnrm)));
+  vec3 r = normalize(reflect(-normalize(sunLight), normalize(vnrm)));
   float vnrmdotr = max(0.0, dot(normalize(vnrm), r));
   vec3 spec = Ks * pow(vnrmdotr, shexp) * lightColor;
 

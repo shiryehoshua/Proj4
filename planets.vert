@@ -18,6 +18,7 @@ in vec2 vertTex2;
 out vec4 fragColor;
 out vec3 texCoord;
 out vec3 vnrm;
+out vec3 sunLight;
 
 void main() {
 
@@ -38,4 +39,7 @@ void main() {
 
   fragColor.rgb = objColor;
   fragColor.a = 1.0;
+
+  // set direction of the sun
+  sunLight = normalize(modelMatrix * (-vertPos)).xyz;
 }
